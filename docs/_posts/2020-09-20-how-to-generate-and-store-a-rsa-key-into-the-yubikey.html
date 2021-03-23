@@ -1,0 +1,75 @@
+---
+layout: post
+title: How to generate and store a RSA key into the YubiKey
+description: In this tutorial, I'm going to generate a new RSA key and
+  store it into YubiKey and I create backup key with the same RSA private key.
+keywords: YubiKey RSA generate private key
+date: 2020-09-20 13:31:12.000000000 +03:00
+categories: []
+tags:
+- private key
+- RSA
+- YubiKey
+permalink: "/2020/09/how-to-generate-and-store-a-rsa-key-into-the-yubikey/"
+---
+
+<p>I have stored my RSA private keys in my PC's hard drive, since a short time ago I bought a YubiKey, which makes it possible to store my private key in a safe place. The YubiKey is a hardware authentication device manufactured by Yubico that supports one-time passwords, <strong>public-key cryptography and authentication</strong>, and the Universal 2nd Factor (U2F) and FIDO2 protocols. In this tutorial, I'm going to generate a new RSA key and store it into my YubiKey.</p>
+<p>What makes the YubiKey storage to be better than store RSA key into the hard drive, is that when RSA key is stored into the YubiKey, it's not possible to get it back again. It means that, if I don't physically lost my YubiKey device, I can be sure that nobody doesn't have a copy of my RSA key.</p>
+<p>There is two options to generate your RSA key. The first one is to use the YubiKey's built-in GPG and generate a new RSA key pair inside of the key. This option's advantages is that your private key hasn't ever been on any other device, but disadvantages is that you can't create a backup YubiKey with the same RSA key. Therefore this options advantages is the same time it's disadvantages. The second option is that you generate the private key externally from the YubiKey by your computer.</p>
+<p>I decided to go with the second option, because I want to make a backup key with the same RSA key.</p>
+<p>This tutorial is following pretty much of <a href="https://gist.github.com/artizirk/d09ce3570021b0f65469cb450bee5e29">this tutorial</a> and <a href="https://support.yubico.com/support/solutions/articles/15000006420-using-your-yubikey-with-openpgp">here is Yubico's official tutorial</a>.</p>
+<p>I highly recommend you to generate your private key in the <strong>live linux distribution and offline!</strong> Live linux is running in the RAM, so once you shutdown the OS all it's data is gone, which means that your private key hasn't ever been in the hard drive, only in the RAM.</p>
+
+<h2>Generate GPG master, sub and revocation keys</h2>
+
+{% highlight shell %}
+$ gpg --gen-revoke 1234ABCD > 1234ABCD-revocation.asc
+-> Select 3
+-> Enter
+-> y
+$ gpg --quick-add-key rsa4096 encrypt 5y
+$ gpg --export-secret-keys > yourname_1234ABCD_secret-key.asc
+$ gpg -a --export 1234ABCD > yourname-key.pub
+{% endhighlight %}
+
+<h2>Move secret keys into the YubiKey</h2>
+
+{% highlight shell %}
+$ gpg --edit-key 1234ABCD
+-> keytocard
+-> 1
+-> keytocard
+-> 3
+save
+{% endhighlight %}
+
+In addition to this, I moved those three files (yourname_1234ABCD_secret-key.asc, yourname-key.pub and 1234ABCD-revocation.asc) just in case to the USB stick, which I kept in a safe place. Also I did another backup YubiKey, which I will do next.</pre>
+
+<h2>Backup a YubiKey</h2>
+
+<p>Follow these instructions, if you would like to copy the previous generated key to the another YubiKey. For some reason GPG prevents to move the secret key into two devices and it gives a following error message:</p>
+
+{% highlight shell %}
+gpg: KEYTOCARD failed: Unusable secret key
+{% endhighlight %}
+
+<p>I found discussion about this topic <a href="https://github.com/drduh/YubiKey-Guide/issues/19">here</a>.</p>
+<p>The workaround is to delete ~/.gnupg directory and then import your secret key again. Caution! In this step I'm going to delete my whole gpg keyring and after that all it's secrets is gone! If you understand what we are going to do, run the following commands:</p>
+
+{% highlight shell %}
+$ rm -r ~/.gnupg
+$ gpg --import yourname_1234ABCD_secret-key.asc
+{% endhighlight %}
+
+<p>And then repeat a last chapter "Move secret keys to YubiKey".</p>
+
+<h2>Other usefull gpg commands</h2>
+
+{% highlight shell %}
+$ gpg --card-status
+$ gpg -k
+$ gpg --list-keys
+$ gpg --with-keygrip -k
+$ gpg -K
+$ gpg --list-secret-keys
+{% endhighlight %}
