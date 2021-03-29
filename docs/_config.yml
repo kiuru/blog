@@ -23,9 +23,24 @@ email: niko@kiuru.net
 description: >
   Software Engineer
 baseurl: "/blog" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://kiuru.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: NikoKiuru
 github_username:  kiuru
+
+disqus:
+  shortname: nikokiuru
+
+minima:
+  social_links:
+    twitter: NikoKiuru
+    github: kiuru
+    stackoverflow: "1707122"
+    facebook: niko.kiuru
+    instagram: nikokiuru
+    linkedin: nikokiuru
+
+google_analytics: UA-32009031-1
+show_excerpts: false
 
 # Build settings
 theme: minima

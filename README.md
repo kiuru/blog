@@ -6,9 +6,15 @@ My blog nikokiuru.com
     $ cd docs
     $ jekyll new .
 
-## Run Jekyll
+## Run Jekyll with PowerShell
 
-    $ bundle exec jekyll serve
+### Development environment
+
+    PS $env:JEKYLL_ENV="development" ; bundle exec jekyll serve
+
+### Production environment
+
+    PS $env:JEKYLL_ENV="production" ; bundle exec jekyll serve
 
 ## Import data from Wordpress
 
