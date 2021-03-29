@@ -1,0 +1,113 @@
+---
+layout: post
+author: Niko Kiuru
+title: Ruby on Rails Linuxissa
+date: 2013-10-10 23:16:49.000000000 +03:00
+categories:
+- Linux palvelimena - ICT4TN003
+tags:
+- apache2
+- linux
+- phusion passenger
+- Ruby on Rails
+- Ubuntu
+permalink: "/2013/10/ruby-on-rails-linuxissa/"
+---
+<p>Tämän ohjeen mukaisesti on saatu testatusti toimimaan oma kehitysympäristöni Xubuntu 13.10 saucy. Ubuntu 12.04 LTS ei aikaisemman testin perusteella toiminut, mutta tulen lähipäivinä päivittämään tämän ohjeen toimimaan myös sillä.</p>
+<h2>Asennetaan Ruby on Rails</h2>
+<p>Testattuani asentaa Ruby on Rails moneen eri linuxin levityspakettiin tai niiden eri versioihin, olen tullut siihen johtopäätökseen että järkevintä on asentaa RVM (Ruby Version Manager), jonka kautta hallitaan Rubya. RVM löytyy myös pakettivarastosta, mutta siellä on tällä hetkellä vanha ja buginen versio, joten järkevintä on asentaa se RVM:n repositorista:</p>
+{% highlight shell %}
+
+$ sudo apt-get update
+$ sudo apt-get -y install curl
+$ sudo curl -L https://get.rvm.io | bash -s stable --ruby --autolibs=enable --auto-dotfiles
+
+{% endhighlight %}
+<p>Luodaan RVM:lle alias, jotta pystymme kutsumaan sitä myös jatkossa:</p>
+{% highlight shell %}
+
+$ source $HOME/.rvm/scripts/rvm
+
+{% endhighlight %}
+<p>Asennetaan rails:</p>
+{% highlight shell %}
+
+$ sudo gem install rails
+
+{% endhighlight %}
+<h2>Hei Rails!</h2>
+<p>Luodaan "Hei Maailma" rails projekti:</p>
+{% highlight shell %}
+
+$ mkdir -p /home/niko/public_html/
+$ cd /home/niko/public_html/
+$ rails new hello-rails
+
+{% endhighlight %}
+<h2>Asennetaan Apache2</h2>
+{% highlight shell %}
+
+$ sudo apt-get -y install apache2
+$ sudo a2enmod rewrite
+$ sudo a2enmod userdir
+$ sudo service apache2 restart
+
+{% endhighlight %}
+<h2>Asennetaan Phusion Passenger</h2>
+{% highlight shell %}
+
+$ sudo apt-get -y install libapache2-mod-passenger
+
+{% endhighlight %}
+<p>Luodaan apacheen uusi virtualhost:</p>
+{% highlight shell %}
+
+$ sudoedit /etc/apache2/sites-available/hello-rails.conf
+
+{% endhighlight %}
+<p>Kirjoita seuraava koodi hello-rails -tiedostoon (korvaa home-kansion käyttäjä omalla):</p>
+{% highlight shell %}
+
+<VirtualHost *:80>
+  RailsEnv development
+  ServerName hello-rails
+  DocumentRoot /home/niko/public_html/hello-rails/public/
+</VirtualHost>
+
+{% endhighlight %}
+<p>Hyväksy uusi sivusi, ja lataa Apache:n asetukset uudestaan:</p>
+{% highlight shell %}
+
+$ sudo a2ensite hello-rails.conf
+$ sudo service apache2 restart
+
+{% endhighlight %}
+<h2>Testaus</h2>
+<p>Otetaan sivustoon yhteyttä curlilla, todistaaksemme railsin toimivuuden:</p>
+{% highlight shell %}
+
+$ curl -I hello-rails
+
+{% endhighlight %}
+<p>Tulos:</p>
+{% highlight shell %}
+
+HTTP/1.1 200 
+Date: Thu, 05 Dec 2013 16:10:47 GMT
+Server: Apache/2.4.6 (Ubuntu)
+X-Powered-By: Phusion Passenger (mod_rails/mod_rack) 3.0.13
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-UA-Compatible: chrome=1
+Cache-Control: max-age=0, private, must-revalidate
+X-Request-Id: d63000a5-d953-4346-bf1f-4a9c4ff4f8db
+X-Runtime: 0.009467
+Set-Cookie: request_method=HEAD; path=/
+ETag: "9fdff472a0cc0802ae8009cd2322f2da"
+Status: 200
+Content-Type: text/html; charset=utf-8
+
+{% endhighlight %}
+<h2>Lähteet</h2>
+<p><a href="https://rvm.io/rvm/install" target="_blank">https://rvm.io/rvm/install</a></p>

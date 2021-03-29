@@ -1,0 +1,17 @@
+---
+layout: post
+author: Niko Kiuru
+title: MySQL ja transaktiot
+keywords: MySQL, transaktio, transaction, MyISAM, InnoDB, begin transactio,
+  commit, rollback
+description: Ongelma kohta MySQL:n transaktioin kanssa, ja kuinka ratkaista
+date: 2012-08-09 19:21:07.000000000 +03:00
+categories:
+- Projects
+tags:
+- InnoDB
+- MyISAM
+- MySQL
+permalink: "/2012/08/mysql-ja-transaktiot/"
+---
+<p>MySQL transaktioita tehdessäni vastaan tuli ongelma, jossa transaktiot eivät toimineet. MySQL:ssä oletus moottorina on MyISAM. MyISAM:lla on omat hyvät puolensa, jonka takia se on valittu oletus moottoriksi, mutta huonona puolena on, että se ei tue transaktioita. Jos haluat käyttää transaktioita on taulussa vaihdettava moottori InnoDB:seen. MyISAM:n ja InnoDB:n hyvistä ja huonoista puolista löytyy paljon artikkeleita googlettamalla esim. "MySQL MyISAM vs InnoDB". Transaktiot ovat kuitenkin sen verran hyödyllisiä, että niiden takia on järkevämpää käyttää InnoDB:tä.</p>

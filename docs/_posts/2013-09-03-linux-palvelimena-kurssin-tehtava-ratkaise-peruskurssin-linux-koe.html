@@ -1,0 +1,186 @@
+---
+layout: post
+author: Niko Kiuru
+title: 'Linux palvelimena kurssin tehtävä: Ratkaise peruskurssin linux-koe'
+date: 2013-09-03 13:28:18.000000000 +03:00
+categories:
+- Linux palvelimena - ICT4TN003
+tags:
+- apache2
+- linux
+- php5
+- python
+permalink: "/2013/09/linux-palvelimena-kurssin-tehtava-ratkaise-peruskurssin-linux-koe/"
+---
+<p>Saimme Linux palvelimena kurssin ensimmäiseksi tehtäväksi ratkaista jonkin aikaisemman peruskurssin kokeen.<br />
+<strong>Huom! Koska Linuxin perusteet ovat itselleni tutut, olen kirjoittanut ajan säästämiseksi tämän artikkelin ulkomuistista.</strong></p>
+<p>Valitsin itse tämän: <a href="http://terokarvinen.com/2012/koe-tyoasemat-ja-tietoverkot-33-linux" target="_blank">http://terokarvinen.com/2012/koe-tyoasemat-ja-tietoverkot-33-linux</a>.</p>
+<blockquote><p>Tervetuloa Kiertoradan Kansa Oy:n tietohallintoon! Olet toistaiseksi koko IT-osastomme.<br />
+Asenna meille työasema, jolla voi surffailla wepissä, kirjoittaa dokumentteja ja tehdä taulukkolaskentaa. Kirjoitusohjelmista OpenOffice on meille tuttu, voitko asentaa myös sen?</p></blockquote>
+<p>Xubuntun asennus rutiinit ovat lähes identtiset ubuntun kanssa. Tästä minulla on valmiit ohjeet jo olemassa aikasemmassa artikkelissa:<br />
+<a href="http://nikokiuru.com/2011/08/ubuntu-11-04-asennus/" target="_blank">http://nikokiuru.com/2011/08/ubuntu-11-04-asennus/</a></p>
+<blockquote><p>Meillä työskentelevät Mikko Mallikas, Maija Mehiläinen, Einari Vähäkäähkä, Ik E, Veijo Miettinen ja Håkan Persson. Tekisitkö meille käyttäjät ja jokaiselle esimerkkikotisivun. Voimme sitten muokata sivut SSH-yhteydellä mieleisiksemme. Tallenna käyttäjätunnukset ja salasanat kotihakemistoosi pelkkänä tekstinä tiedostoon users.txt.</p></blockquote>
+
+<p>Ensimmäisenä päivitetään apt kirjasto:</p>
+
+{% highlight shell %}
+$ sudo apt-get update
+{% endhighlight %}
+
+<p>Seuraavaksi lisätään uudet käyttäjät komennolla:</p>
+
+{% highlight shell %}
+$ useradd käyttäjä
+{% endhighlight %}
+
+<p>jonka jälkeen annetaan käyttäjälle vahva salasana, ja muutama muu käytättäjäkohtainen tieto.</p>
+<p>Kokonaisuudessaan siis:</p>
+
+{% highlight shell %}
+$ useradd mikko
+$ useradd maija
+$ useradd einari
+$ useradd ik
+$ useradd håkan
+{% endhighlight %}
+
+<p>Kirjoitetaan käyttäjien tunnukset ja salasanat muistiin omaan kotihakemistoomme:</p>
+
+{% highlight shell %}
+$ cd ~
+$ nano users.txt
+{% endhighlight %}
+
+<p><strong>Ctrl + o</strong> -näppäinyhdistelmällä saadaan tallennettua toiminto, ja <strong>ctrl + x</strong> päästään poist perustilaan.</p>
+<p>Seuraavaksi asennetaan apache2 http-palvelin, käyttäjien kotisivuja varten:</p>
+
+{% highlight shell %}
+$ sudo apt-get install apache2
+$ sudo a2enmode userdir
+$ sudo service apache2 restart
+{% endhighlight %}
+
+<p>Nyt käyttäjien kotihakemistoihin on ilmestynyt uusi kansio "public_html", jotka ovat auki ulkoverkkoon perjaatteella: "http://domain_tai_serverin_ip/~kayttaja"</p>
+<blockquote><p>Einari haluaa käyttää PHP:ta. Tee Einarille “Hei maailma”.</p></blockquote>
+<p>PHP-tuen apacheen saa asennettua seuraavasti:</p>
+
+{% highlight shell %}
+$ sudo apt-get install php5
+$ sudo apt-get install libapache2-mod-php5
+$ sudo a2enmod php5
+$ sudo service apahce2 restart
+{% endhighlight %}
+
+<p>Jotta käyttäjät pystyvät ajamaan php:ta omasta kotihakemistosta, täytyy meidän hieman muokata apache2:n asetustiedostoa:</p>
+
+{% highlight shell %}
+$ cd /etc/apache2/mods-enabled/
+$ sudoedit php5.conf
+{% endhighlight %}
+
+<p>Kommentoi seuraavat rivit antamalla # merkin rivin eteen:</p>
+
+{% highlight shell %}
+#<IfModule mod_userdir.c>
+# <Directory /home/*/public_html>
+# php_admin_value engine Off
+# </Directory>
+#</IfModule>
+{% endhighlight %}
+
+<p>Lopuksi restartataan apache2, jotta saadaan äskeinen muutos voimaan:</p>
+
+{% highlight shell %}
+$ sudo service apache2 restart
+{% endhighlight %}
+
+<p>Tehdään Einarin kotihakemistoon "Hei maailma" php-tiedosto.</p>
+<p>Ensimmäiseksi asennetaan openssh-serveri, jotta voimme kirjautua käyttäjinä sisälle.</p>
+
+{% highlight shell %}
+$ sudo apt-get install openssh-server
+{% endhighlight %}
+
+<p>Jonka jälkeen kirjaudutaan sisälle einarina:</p>
+
+{% highlight shell %}
+$ ssh einari@localhost
+{% endhighlight %}
+
+<p>Ja seuraavaksi annetaan einarin salasana.</p>
+<p>Sitten luodaan einarille kotihakemistoon public_html.</p>
+
+{% highlight shell %}
+$ cd /home/einari/
+$ mkdir public_html
+{% endhighlight %}
+
+<p>Ja seuraavaksi luodaan Einarille "Hei maailma" testi php-skripti.</p>
+
+{% highlight shell %}
+$ cd /home/einari/public_html
+$ nano index.php
+{% endhighlight %}
+
+<p>Kirjoita tiedostoon seuraava scripti:</p>
+
+{% highlight shell %}
+<?php echo "Hello php!"; ?>
+{% endhighlight %}
+
+<p>Ctrl + o tallensi tiedoston, ja ctrl + x sulki sen, kuten aikaisemminkin.</p>
+<p>Ja lopuksi voimme poistua einarina kirjoittamalla <strong>exit</strong> komentoriville.</p>
+<blockquote><p>Maija haluaa ohjelmoida Pythonilla. Mikko haluaa ohjelmoida Javalla. Tee ja testaa “hei maailmat” kummankin kotihakemistoon.</p></blockquote>
+
+<p>Asennetaan python:</p>
+
+{% highlight shell %}
+$ apt-get install python-dev
+{% endhighlight %}
+
+<p>Tehdään "hei maailma" tiedosto Maijan kotihakemistoon.<br />
+Eli ensimmäiseksi kirjaudutaan sisään Maijana:</p>
+
+{% highlight shell %}
+$ ssh maija@localhost
+{% endhighlight %}
+
+<p>Ja luodaan maijalle "Hei maailma!" esimerkki koodi:</p>
+
+{% highlight shell %}
+$ nano heimaailma.py
+{% endhighlight %}
+
+<p>Kirjoitetaan tiedostoon heimaailma.py tiedostoon:</p>
+
+{% highlight shell %}
+print 'Hei maailma!'
+{% endhighlight %}
+
+<p>ja testiksi voimme vielä ajaa sen komennolla:</p>
+
+{% highlight shell %}
+$ python heimaailma.py
+{% endhighlight %}
+
+<blockquote><p>Kuulin, että saatat päästä innovaattorikurssille Turkkiin. Valmistaudu siis ylläpitämään konettamme verkon yli. Suojaa kone tulimuurilla. Tee reiät tässä asentamiasi palveluita varten</p></blockquote>
+<p>Asennetaan palomuurisovellus ufw:</p>
+
+{% highlight shell %}
+$ sudo apt-get install ufw
+{% endhighlight %}
+
+<p>seuraavaksi kytketään palomuuri päälle, sekä laitetaan portit 22 ja 80 avoimiksi:</p>
+
+{% highlight shell %}
+$ sudo ufw enable
+$ sudo ufw allow 22
+$ sudo ufw allow 80
+$ sudo ufw default deny
+{% endhighlight %}
+
+<p>tämän jälkeen serveri on käynnistettävä uudestaa, jotta asetukset astuvat voimaan.</p>
+
+{% highlight shell %}
+$ sudo shutdown -r 0
+{% endhighlight %}

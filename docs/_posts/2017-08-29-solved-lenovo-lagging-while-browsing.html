@@ -1,0 +1,24 @@
+---
+layout: post
+author: Niko Kiuru
+title: "[Solved] Lenovo lagging while browsing"
+keywords: Lenovo lagging
+description: Lenovo ThinPad screen keeps freezing and lagging and things
+  getting worse during browsing with Chrome. Same problem has experienced with Lenovo
+  Yoga.
+date: 2017-08-29 10:21:55.000000000 +03:00
+categories: []
+tags: []
+permalink: "/2017/08/solved-lenovo-lagging-while-browsing/"
+---
+<p>I came across with frustrating problem when I deployed my new <strong>Lenovo ThinkPad T570</strong> laptop. Screen keeps freezing and lagging all the time. Things getting worse during I browsing with Chrome, laptop was totally useless. I had up-to-date Windows 10 operating system and also I had updated my all drivers including BIOS. Luckily for I seen as soon that I wasn't only one who has got this problem.</p>
+<p>The problem occurs only when laptop's AC is plugged off. It depends on battery usages, when computer used on battery it turns on battery save mode which turns "System cooling policy" from Active to Passive, and low down computer's power for getting longer battery usage.</p>
+<p>My college have also same laptop as me, and he has experienced the same problem. Fortunately I finally found the solution which helps both of us and seems that it has really works. The solution is change your computer's <strong>Power Plan's Cooling policy</strong> to <strong>Active</strong> mode:</p>
+<ol>
+<li>Go to "Control Panel" -> "Hardware and Sound" -> "Power Options" -> "Edit Plan Settings" -> "Change advanced power settings".</li>
+<li>Expand "Processor power management" -> "System cooling policy" -> Change "On battery" <strong>from Passive to Active</strong>.</li>
+</ol>
+<p>This solution is tested with two Lenovo T570 laptops, and I expect it works too with Lenovo Yoga models.</p>
+<p>I really appreciate if everyone who will test this method could also leaves comment on this post does it works.</p>
+<p>Post which related on this problem:<br />
+<a href="https://forums.lenovo.com/t5/Lenovo-Yoga-Series-Notebooks/Lenovo-Yoga-910-keeps-freezing-lagging-whilst-browsing/td-p/3527874/page/2">https://forums.lenovo.com/t5/Lenovo-Yoga-Series-Notebooks/Lenovo-Yoga-910-keeps-freezing-lagging-whilst-browsing/td-p/3527874/page/2</a></p>

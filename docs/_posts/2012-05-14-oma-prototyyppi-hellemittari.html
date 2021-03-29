@@ -1,0 +1,117 @@
+---
+layout: post
+author: Niko Kiuru
+title: Oma prototyyppi, Hellemittari!
+date: 2012-05-14 23:58:39.000000000 +03:00
+categories:
+- Courses
+- Projects
+- Prototyypin rakentaminen - BUS4TN007-1
+tags:
+- Arduino
+- python
+permalink: "/2012/05/oma-prototyyppi-hellemittari/"
+---
+<p>Suunnittelimme ja rakensimme luokkakaveri Samuelin kanssa oman prototyypin kurssin lopputyönä. Näin kesän alkussa on tarvetta laittaa kuntoon oma Hellemittari!</p>
+<p>Hellemittari mittaa LM35 lämpömittarisensorilla ilman lämpötilaa. Me puolestaan loimme siihen visuaalisen näyttötavan sekä mittaria on mahdollista lukea myös etänä. Kun teimme proton yhteistyöllä niin sovimme, että minä hoidan mittauspuolen eli mittaan ilman lämpötilan ja syötän sen tietokantaamme. Samuel taas puolestaan hoitaa lämpötilan hakemisen sekä yhteis työllä työstimme visuaalisen lämpötilan näyttötavan.</p>
+
+<p>Ylläoleva piiri kertoo ilman lämpötilan, kun sitä siltä kysytään. Lähdekoodit löytyvät alta:</p>
+
+{% highlight shell %}
+/**
+ * Niko Kiuru
+ * License: GPL version 2 or later
+ */
+float tempc = 0; // Celsius
+int readPin = 0;
+char variable = 0;
+void setup() {
+Serial.begin(9600); // bit/s
+pinMode(13, OUTPUT);
+}
+
+void loop() {
+variable = Serial.read();
+if (variable == 's') {
+tempc = analogRead(readPin);
+tempc = (5.0 * tempc * 100.0)/1024.0;
+Serial.print(tempc);
+variable = 0;
+delay(100);
+}
+}
+{% endhighlight %}
+
+<p>Kyseistä Arduinoa ohjataan meidän tekemällä python ohjelmalla, joka lähettää tietyn väliajoin pyyntöjä Arduinolle ilman lämpötilasta. Alta löytyy lähdekoodit:</p>
+
+{% highlight shell %}
+## Niko Kiuru
+## License: GPL version 2 or later
+import serial
+import urllib2
+import time
+
+ser = None
+
+def main():
+global ser
+ser = serial.Serial("/dev/ttyACM1")
+print("Temperature Server Starting...")
+while (ser):
+print("Serial port " + ser.portstr + " opened.")
+ch = 's'
+print("Sending...")
+ser.write(ch)
+degree = ser.read(5)
+print degree
+# url = osoite johon otetaan yhteyttä degree parametrilla
+# Esimerkki urli:
+url = 'www.esimerkkidomain.com?degree=%s' % degree
+urllib2.urlopen(url)
+time.sleep(5)
+
+print("Temperature Server shutdown")
+
+if __name__ == "__main__":
+main()
+{% endhighlight %}
+
+<p>Tietokanta puoli toteutettiin php:n get parametreilla, jotka se vie mysql tietokantaan. Lähdekoodit alla:</p>
+
+{% highlight shell %}
+/**
+ * Niko Kiuru
+ * License: GPL version 2 or later
+ */
+<?php // Tietokanta yhteys
+$connect = mysql_connect('localhost', 'tunnus', 'salasana');
+if (!$connect) { die('Could not connect: ' . mysql_error()); }
+// Valitaan tietokanta
+$db = "arduino";
+$db_selected = mysql_select_db($db, $connect);
+if (!$db_selected) {die ("Can't use $db : " . mysql_error()); }
+$degree = $_GET["degree"];
+$time = date("d.m.Y H:i:s");
+if (isset($degree)) {
+$insertDegree = mysql_query("INSERT INTO temperature (degree, datetime) VALUES ('$degree', NOW())") or die(mysql_error());
+echo $degree."C ".$time." added!";
+} else { 
+$selectDegree = mysql_query("SELECT * FROM temperature") or die(mysql_error());
+while ($result = mysql_fetch_array($selectDegree)) {
+$degreeList[$result["id"]] = array("degree" =-?> $result["degree"], "time" => $result["datetime"]);
+$degree_r = $result["degree"];
+}
+
+//$degreeList = json_encode($degreeList);
+//print_r($degreeList);
+echo $degree_r;
+}
+
+mysql_close($connect);
+?>
+{% endhighlight %}
+
+<p>Ylläolevan koodin saa helposti muokattua json-rajapintaa nuodattavaksi, mutta ajan loputtua emme ehtineet saamaan python ohjelman json-dekooderia toimimaan kunnolla jotta olisimme voineet käyttää sitä. Loput vaiheista toteutti Samuel, ja hän käy lävitse tekovaiheita omassa blogi postauksessaan. Linkki Samuelin blogi postaukseen: http://kontsu.wordpress.com/2012/05/14/arduino-remote-thermometer/</p>
+
+<p>Demovideo:<br />
+<iframe src="https://www.youtube.com/embed/pId-v4TWHyk?rel=0" frameborder="0" width="560" height="315"></iframe></p>

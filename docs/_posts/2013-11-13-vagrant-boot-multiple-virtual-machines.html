@@ -1,0 +1,86 @@
+---
+layout: post
+author: Niko Kiuru
+title: Vagrant boot multiple virtual machines
+date: 2013-11-13 22:09:06.000000000 +02:00
+categories: []
+tags:
+- multi-machine
+- Ubuntu
+- Vagrant
+permalink: "/2013/11/vagrant-boot-multiple-virtual-machines/"
+---
+<p>Vagrant is excellent tool for creating easily new virtual machines. It takes less than 1 minute (image downloading take some times) getting vagrant up. If you would like to management multiple virtual machines easily select vagrant. In this instructions we create first new virtual machine and after that we build same time multiple virtual machines.</p>
+<h2>Install Vagrant</h2>
+{% highlight shell %}
+$ sudo apt-get -y install vagrant virtualbox
+
+{% endhighlight %}
+<p>Next you download Ubuntu 14.04 (trusty32) box (like vagrant call their images). When we add image to box vagrant keep its in the memory, and we could then use it to later:</p>
+{% highlight shell %}
+$ vagrant box add trusty32 http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box
+
+{% endhighlight %}
+<p>Generating vagrant's initializing file. Vagrantfile generating in to same directory where you give that command. Vagrantfile include config class which tell vagrant what you want to do with it. Now we just want to do only one virtual machine, but later we have to little bit modify this config-file, if we want to building up multiple virtual machines:</p>
+{% highlight shell %}
+$ vagrant init trusty32
+
+{% endhighlight %}
+<h2>Set Vagrant up</h2>
+{% highlight shell %}
+$ vagrant up
+
+{% endhighlight %}
+<p>And take connect to vagrant by ssh:</p>
+{% highlight shell %}
+$ vagrant ssh
+
+{% endhighlight %}
+<p>If you want destroy our virtual machine, you could give command:</p>
+{% highlight shell %}
+$ vagrant destroy
+
+{% endhighlight %}
+<h2>Multiple virtual machines</h2>
+<p>Now we are successfully create new virtual machine. But, we want something more. We would like to create multiple virtual machines. First we have little modify our config vagrantfile.</p>
+{% highlight shell %}
+$ nano Vagrantfile
+
+{% endhighlight %}
+<p>And Vagrantfile code is:</p>
+{% highlight shell %}
+Vagrant::Config.run do |config|
+  config.vm.define "virtual1" do |v|
+    v.vm.box = "trusty32"
+  end
+  config.vm.define "virtual2" do |v|
+    v.vm.box = "trusty32"
+  end
+end
+
+{% endhighlight %}
+<p>We made two virtual machines "virtual1" and "virtual2". Line <strong>v.vm.box = "trusty32"</strong> tell that we use trusty32 box.</p>
+<h2>Set up multiple Vagrants</h2>
+{% highlight shell %}
+$ vagrant up
+
+{% endhighlight %}
+<p>Virtual machines getting up, and when they are ready you can take connect to them by command:</p>
+{% highlight shell %}
+$ vagrant ssh virtual1
+
+{% endhighlight %}
+<p>or</p>
+{% highlight shell %}
+$ vagrant ssh virtual2
+
+{% endhighlight %}
+<p>And you can destroy them by command:</p>
+{% highlight shell %}
+$ vagrant destroy
+
+{% endhighlight %}
+<h2>Source</h2>
+<p><a href="http://docs.vagrantup.com/v2/multi-machine/" target="_blank">http://docs.vagrantup.com/v2/multi-machine/</a><br />
+<a href="http://terokarvinen.com/2012/vagrant-ubuntu-12-04-create-boot-new-virtual-machine-vagrant-ssh-virtualbox-apt-get" target="_blank">http://terokarvinen.com/2012/vagrant-ubuntu-12-04-create-boot-new-virtual-machine-vagrant-ssh-virtualbox-apt-get</a></p>
+<p><strong>EDIT 2014-10-05: Update precise32 (Ubuntu 12.04) to trusty32 (Ubuntu 14.04).</strong></p>

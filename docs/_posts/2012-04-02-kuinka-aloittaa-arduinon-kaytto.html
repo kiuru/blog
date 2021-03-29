@@ -1,0 +1,31 @@
+---
+layout: post
+author: Niko Kiuru
+title: Kuinka aloittaa Arduinon käyttö?
+date: 2012-04-02 14:54:47.000000000 +03:00
+categories:
+- Courses
+- Prototyypin rakentaminen - BUS4TN007-1
+tags:
+- Arduino
+permalink: "/2012/04/kuinka-aloittaa-arduinon-kaytto/"
+---
+<p>Avoimeen lähdekoodiin perustuva Arduino on mikrokontrolleri-elektroniikka ja ohjeloimtiympäristö. Ohjelmointi tapahtuu C++:aan perustuvalla Arduino-ohjelmointikielellä.<br />
+Itselläni on käytössä koululta lainattu Arduino Uno, ja tässä blogi postauksessa kartoitan hieman miten se käytännössä toimii.</p>
+<p>Aluksi tulee asentaa Arduinon ohjelmointiympäristö.</p>
+<p>Windows käyttäjät voivat ladata sen osoitteesta: http://arduino.cc/en/Main/Software</p>
+Linux käyttäjät saavat sen pakettien hallinnasta komennolla:
+
+{% highlight python %}
+$ sudo apt-get install arduino
+{% endhighlight %}
+
+<p>Avattuasi Arduinon ohjelmistympäristön eteesi avautuu editori. Kytketään Arduino komponentti kiinni LED + napa pinniin numero 13 ja - napa groudiin eli GND. Sen jälkeen kiinnitetään se tietokoneen USB-väylään</p>
+<p>Tuodaan esimerkkikoodi Arduinon demoomiseksi: File -> Examples -> Basics -> Blink.</p>
+<p>"void setup()" methodissa määritellään ohjelmiston conffaus. Kyseisessä Blink esimerkki ohjelmassa setupissa määritellään "pinMode(13, OUTPUT)" aktiiviseksi. Eli kerrotaan laitteelle että Pinnissä numero 13 tehdään toimintoja.</p>
+<p>"void loop()" methodissa määritellään mitä ohjelma tekee. Looppia pyöritetään jatkuvasti ympäri ja sehän on robotin idea, se jatkaa toimimista niin kauan kuin käsketään sen lopettamaan.</p>
+<p>Esimerkissä looppiin oli laitettu:</p>
+<p>"digitalWrite(13, HIGH)" eli annetaan käsky viedä virtaa pinniin numero 13.</p>
+<p>"delay(1000)" taas käskee ohjelman odottamaan 1000 millisekunttia eli 1 sekuntti.</p>
+<p>"digitalWrite(13, LOW)" puolestaan katkaisee virransyötön pinniin numero 13.</p>
+<p>Ohjelman saa ajettua UPLOAD painikkeella.</p>

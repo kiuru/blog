@@ -1,0 +1,36 @@
+---
+layout: post
+author: Niko Kiuru
+title: Hei Maailma! Python:lla, sekä Javalla
+date: 2011-09-28 14:24:08.000000000 +03:00
+categories:
+- Courses
+- Työasemat ja tietoverkot - ICT1TN002
+tags:
+- java
+- python
+permalink: "/2011/09/hei-maailma-pythonlla-seka-javalla/"
+---
+<p>Kun lähdetään opettelemaan uutta ohjelmointikieltä, ensimmäinen vaihe on luoda toimiva "Hei Maailma!", tulostus. Nyt käyn läpi kahden eri ohjelmointikielen Pythonin, sekä Javan, jossa tulostamme "Hei Maailma!":n.</p>
+<p>Pythonissa tulostaminen käy huomattavasti vähemmällä koodin kirjoituksella verrattuna javaan. Tulostamiseen tarvitaan vain yksi rivi:</p>
+
+{% highlight python %}
+print "Hei Maailma!"
+{% endhighlight %}
+
+<p>Tämän jälkeen ohjelma on valmis ajettavaksi, ja tulostaa Hei Maailma!</p>
+
+<p>Tee tiedosto nimeltään heimaailma.java ja sinne seuraava koodinpätkä:</p>
+
+{% highlight java %}
+public class HeiMaailma {
+    public static void main(String[] args) {
+        System.out.println("Hei Maailma!");
+    }
+}
+{% endhighlight %}
+
+<p>Ohjelma käännetään Java Complierilla (=kääntäjä):</p>
+<p>Javac heimaailma.java</p>
+<p>Java kääntäjä luo tiedoston heimaailma.class, jonka jälkeen ohjelma on valmis ajettavaksi komennolla:</p>
+<p>java heimaailma</p>

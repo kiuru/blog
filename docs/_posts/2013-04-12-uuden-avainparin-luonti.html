@@ -1,0 +1,25 @@
+---
+layout: post
+author: Niko Kiuru
+title: Uuden avainparin luonti
+description: Kuinka luoda uusi avainpari puttygen:llä
+keywords: puttygen, avainpari, avain, public key, private key, openssh
+date: 2013-04-12 10:08:09.000000000 +03:00
+categories: []
+tags:
+- avainpari
+- openssh
+- private key
+- public key
+- puttygen
+permalink: "/2013/04/uuden-avainparin-luonti/"
+---
+<p>Tässä ohjeessa käydään lävitse kuinka muodostetaan uusia avainpareja Windowsilla PuTTYgen -ohjelmalla. Avaimia tarvitaan kun halutaan suojata oma liikenne sinun ja serverin välillä. Avaimet antavat vahvan suojauksen mitm kalastelua vastaan. Muistathan että private key on avain joka on tarkoitettu vain sinulle, ja joka tulee pitää paikassa jonne muilla ei ole pääsyä (vastaavasti kuten salasanajen kanssa yleisesti toimitaan). Public key on tarkoitettu jaettavaksi, ja sillä vastapuoli pystyy todentamaan että yhteydenottaja olet tosiaan sinä.</p>
+<p>Avainparit perustuvat siis siihen, että lähettäjä salakirjoittaa lähetettävän datan vastapuolen julkisella avaimella, joka voidaan avata vain julkisen avaimen yksityisellä avainparilla.</p>
+<p>Avainparin generointi:<br />
+1. Klikkaa Generate<br />
+2. heiluta kursoria genereate nappulan yläpuolella olevassa harmaassa alueessa (johtuu luultavasti siitä että puttygen randomisoi kursorin liikkeen perusteella mahdollisimman randomin avaimen)<br />
+3. Anna "key passphrase" kohtaan vahva salasana, ja toista se "Confirm passpharase" kohdassa (Tarvitset tätä salasanaa yhteyden muodostamisessa).<br />
+3. Tallenna public key "Save public key"<br />
+4. Tallenna private key "Save private key"<br />
+5. Tarvittaessa voit tallentaa tavanomaisen private keyn lisäksi OpenSSH muodossa olevan private keyn "Conversions" ylävalikosta ja klikkaamanna "Export OpenSSH key"</p>

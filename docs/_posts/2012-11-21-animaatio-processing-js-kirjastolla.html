@@ -1,0 +1,59 @@
+---
+layout: post
+author: Niko Kiuru
+title: Animaatio Processing.js -kirjastolla
+date: 2012-11-21 19:59:15.000000000 +02:00
+categories:
+- Mobiilituotekehitys - BUS4TN008-2
+tags: []
+permalink: "/2012/11/animaatio-processing-js-kirjastolla/"
+---
+<p>Viikon mobiiilituotekehitys tehtävänä oli luoda animaatio hyväksikäyttämällä Processin.js -javascript-kirjastoa. Ensimmäiseksi teokseksi loin liikkuvan Hello World! näytönsäästäjän.</p>
+<p>Ensiksi lataat processing javascript-kirjaston osoitteesta <a title="Processing.js latausosoite" href="http://processingjs.org/download/" target="_blank">http://processingjs.org/download/</a>
+Processing tiedosto pitää hakea html dokumentissa tagilla:<script type="text/javascript" src="processing-1.4.1.min.js"></script>Lopulta voit kirjottaa processing kieltä script tagien välissä, lisäämällä attribuutin type="text/processing" ja data-processing-target="processing-canvas"
+
+{% highlight html %}
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Processing näytönsäästäjä</title>
+</head>
+<body>
+<script src="processing-1.4.1.min.js"></script>
+<script type="text/processing" data-processing-target="processing-canvas">
+var x = 10;
+var y = 60;
+var xDirec = 4;
+var yDirec = 4;</p>
+<p>// Setup the Processing Canvas
+void setup(){
+	size( 400, 400 );
+}</p>
+<p>// Main draw loop
+void draw(){
+	background( 200 );
+	x = x + xDirec
+	y = y + yDirec;
+	PFont font;
+	font = loadFont("BebasNeue.ttf");
+	textFont(font, 40); // font size
+	fill(100, 150, 400); // color
+	text("Hello World!", x, y);</p>
+<p>	if(x>190) {
+		xDirec=-4;
+	}
+	else if(x<0) {
+		xDirec=4;
+	}
+	if(y>390) {
+		yDirec=-4;
+	}
+	else if(y<25) {
+		yDirec=4;
+	}</p>
+<p>}
+</script>
+<canvas id="processing-canvas"></canvas>
+</body>
+</html>
+{% endhighlight %}

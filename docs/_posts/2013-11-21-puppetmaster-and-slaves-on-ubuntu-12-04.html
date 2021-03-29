@@ -1,0 +1,141 @@
+---
+layout: post
+author: Niko Kiuru
+title: PuppetMaster and slaves on Ubuntu 12.04
+date: 2013-11-21 17:16:11.000000000 +02:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- Puppet
+- PuppetMaster
+- Ubuntu
+permalink: "/2013/11/puppetmaster-and-slaves-on-ubuntu-12-04/"
+---
+<p>I am writing this post as part of course <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linuxin-keskitetty-hallinta-%E2%80%93-ict4tn011-4-syksylla-2013" target="_blank">Linuxin keskitetty hallinta</a> held by Tero Karvinen. In this post I will be install PuppetMaster and I share my puppet configures to my slaves computers (virtual machines). This is very important part of centralized management because after that you will be able to manage your managed computers software in one place.</p>
+<p>In this instructions I use multiple virtual machines by vagrant. If you want to use vagrant too, I have getting started post here: <a href="http://nikokiuru.com/2013/11/vagrant-boot-multiple-virtual-machines/" target="_blank">http://nikokiuru.com/2013/11/vagrant-boot-multiple-virtual-machines/</a></p>
+<p>Preinstall PuppetMaster I was getting up two virtual machines master and slave with same hostnames.</p>
+<p>In Ubuntu 12.04 is not default installed avahi-daemon, so .local (mDNS) domains are not available. We would like to use .local domains with puppet, so we install avahi-daemon:</p>
+
+{% highlight shell %}
+master$ sudo apt-get -y install avahi-daemon
+{% endhighlight %}
+
+<p>I ping master computer by slave to verify that everything working as well:</p>
+
+{% highlight shell %}
+slave$ ping master.local
+{% endhighlight %}
+
+<h2>Install PuppetMaster</h2>
+
+{% highlight shell %}
+master$ sudo apt-get -y install puppetmaster
+{% endhighlight %}
+
+<h2>Configure PuppetMaster</h2>
+<p>In some cases is better first delete puppet ssl certificates. Puppet genereta it to back when we start PuppetMaster again.</p>
+
+{% highlight shell %}
+master$ sudo service puppetmaster stop
+master$ sudo rm -r /var/lib/puppet/ssl
+{% endhighlight %}
+
+<p>Modify Puppet config-file:</p>
+
+{% highlight shell %}
+master$ sudoedit /etc/puppet/puppet.conf
+{% endhighlight %}
+
+<p>Add master's host under [master] -tag</p>
+
+{% highlight shell %}
+dns_alt_names = puppet, master.local
+{% endhighlight %}
+
+<p>Start PuppetMaster:</p>
+
+{% highlight shell %}
+master$ sudo service puppetmaster start
+{% endhighlight %}
+
+<h2>Connecting slaves</h2>
+<p>Install puppet:</p>
+
+{% highlight shell %}
+slave$ sudo apt-get -y install puppet
+{% endhighlight %}
+
+<p>And modify config-file:</p>
+
+{% highlight shell %}
+slave$ sudoedit /etc/puppet/puppet.conf
+{% endhighlight %}
+
+<p>Add master DNS name under [agent] -tag:</p>
+
+{% highlight shell %}
+[agent]
+server = master.local
+{% endhighlight %}
+
+<p>Modify puppet to start automatically:</p>
+
+{% highlight shell %}
+slave$ sudoedit /etc/default/puppet
+{% endhighlight %}
+
+<p>Change start to yes:</p>
+
+{% highlight shell %}
+START=yes
+{% endhighlight %}
+
+<p>Start puppet:</p>
+
+{% highlight shell %}
+slave$ sudo service puppet restart
+{% endhighlight %}
+
+<h2>Accept Slave certificate</h2>
+
+{% highlight shell %}
+master$ sudo puppet cert --list
+master$ sudo puppet cert --sign slave1.example.com
+{% endhighlight %}
+
+<h2>Create new Puppet module</h2>
+
+{% highlight shell %}
+master$ cd /etc/puppet
+master$ sudo mkdir -p modules/hello/manifests/
+master$ sudoedit modules/hello/manifests/init.pp
+class hello {
+  file { '/tmp/hello':
+    content => "Hello PuppetMaster!\n"
+  }
+}
+{% endhighlight %}
+
+<h2>Create site manifest</h2>
+
+{% highlight shell %}
+master$ cd /etc/puppet
+master$ sudoedit manifests/site.pp
+{% endhighlight %}
+
+<p>Add next code line in site.pp:</p>
+
+{% highlight shell %}
+class{"hello":}
+{% endhighlight %}
+
+<h2>Test</h2>
+
+{% highlight shell %}
+slave$ sudo service puppet restart
+slave$ less /tmp/hello
+{% endhighlight %}
+
+<p>If hello file is no there immediately, wait some time and try again.</p>
+<p>Source:<br />
+<a href="http://terokarvinen.com/2012/puppetmaster-on-ubuntu-12-04" target="_blank">http://terokarvinen.com/2012/puppetmaster-on-ubuntu-12-04</a></p>

@@ -1,0 +1,31 @@
+---
+layout: post
+author: Niko Kiuru
+title: Let Facebook video calling working for Windows 8.1
+date: 2014-01-08 23:21:59.000000000 +02:00
+categories: []
+tags:
+- chrome
+- compatibility
+- facebook
+- windows 8.1
+permalink: "/2014/01/let-facebook-video-calling-working-for-windows-8-1/"
+---
+<p>Let me guess, you are upgraded your Windows 8 to Windows 8.1 and then Facebook video calling icon suddenly missing on Facebook. This happening because Windows 8.1 is not yet compatibility for Facebook video calling plugin.</p>
+<p>In this post I will show you how you could fix this compatible problem, and bring video call icon back to Facebook.</p>
+<p><span style="color: #ff0000;">This guide is working only for <strong>Google Chrome</strong>.</span></p>
+<p>1. Explore to directory:<br />
+64-bit:</p>
+{% highlight shell %}
+C:\Program Files (x86)\Google\Chrome\Application
+{% endhighlight %}
+<p>32-bit:</p>
+{% highlight shell %}
+C:\Program Files\Google\Chrome\Application
+{% endhighlight %}
+<p>2. Right-click chrome.exe and select "<strong>Properties</strong>"<br />
+3. Select "<strong>Compatibility</strong>" -tab<br />
+4. Tap "<strong>Run this program for compatibility mode for</strong>" checkbox and choose <strong>Windows 8</strong>!<br />
+5. Click Ok<br />
+6. Open Google Chrome and enjoy!</p>
+<p><a href="http://www.microsoft.com/en-us/windows/compatibility/CompatCenter/ProductDetailsViewer?Name=Facebook%20Video%20Calling&vendor=Facebook&ModelOrVersion=1&tempOsid=Windows%208.1" target="_blank">Follow Facebook video calling plugin Windows 8.1 compatibility status</a></p>

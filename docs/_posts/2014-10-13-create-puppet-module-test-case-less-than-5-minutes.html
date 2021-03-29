@@ -1,0 +1,129 @@
+---
+layout: post
+author: Niko Kiuru
+title: Create Puppet module test case less than 5 minutes
+date: 2014-10-13 22:16:52.000000000 +03:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- module
+- Puppet
+- TDD
+permalink: "/2014/10/create-puppet-module-test-case-less-than-5-minutes/"
+---
+<p>In this post, I'll tell you how to create Puppet module test cases. If you are newbie with Puppet, I recommend you begin by my another post <a title="Hello Puppet!" href="/2013/11/hello-puppet/" target="_blank">Hello Puppet!</a>.</p>
+<p>My using operating system is Xubuntu 14.04 LTS.</p>
+<h2>Hello Git!</h2>
+<p>As every project begin in Hello world, by the same way our project begin in Hello Git!</p>
+<p>Create directory structure:</p>
+{% highlight shell %}
+
+$ mkdir -p puppet/modules/git/manifests
+$ cd puppet
+
+{% endhighlight %}
+<p>Create <code>init.pp</code> in manifests:</p>
+{% highlight shell %}
+
+$ nano modules/git/manifests/init.pp
+
+{% endhighlight %}
+<p>And write bottom lines in file:</p>
+{% highlight shell %}
+
+class git {
+
+  package { 'git':
+    ensure => 'installed',
+  }
+
+}
+
+{% endhighlight %}
+<p>Run our git module:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"git":}'
+
+{% endhighlight %}
+<p>And now git should be installed to our system.</p>
+<h2>Create test case</h2>
+<p>Is time to go on and let make our first test case. In web, I have seen many different variations to make this part of post. But I like to make things easiest way as possible, so I'll show you how to make this part as simplest I know so far.</p>
+<p>Goto git module root:</p>
+{% highlight shell %}
+
+$ cd modules/git
+
+{% endhighlight %}
+<p>Write necessary gems in <code>Gemfile</code>.</p>
+{% highlight shell %}
+
+$ nano Gemfile
+
+source 'https://rubygems.org'
+puppetversion = ENV.key?('PUPPET_VERSION') ? "= #{ENV['PUPPET_VERSION']}" : ['>= 2.7']
+gem 'puppet', puppetversion
+gem 'puppetlabs_spec_helper', '>= 0.1.0'
+gem 'rspec', '>=3.1.0'
+gem 'rspec-puppet'
+
+{% endhighlight %}
+<p>And bundle install gems:</p>
+{% highlight shell %}
+
+$ bundle install
+
+{% endhighlight %}
+<p>Run command <code>rspec-puppet-init</code>, and we got full nicely generated spec directory structure:</p>
+{% highlight shell %}
+
+$ rspec-puppet-init
+
+ + spec/
+ + spec/classes/
+ + spec/defines/
+ + spec/functions/
+ + spec/hosts/
+ + spec/fixtures/
+ + spec/fixtures/manifests/
+ + spec/fixtures/modules/
+ + spec/fixtures/modules/git/
+ + spec/fixtures/manifests/site.pp
+ + spec/fixtures/modules/git/manifests
+ + spec/spec_helper.rb
+ + Rakefile
+
+{% endhighlight %}
+<p><code>Rspec-puppet</code> for some reason miss require <code>puppetlabs_spec_helper</code>. We add it into bottom of file:</p>
+{% highlight shell %}
+
+$ echo "require 'puppetlabs_spec_helper/rake_tasks'" >> Rakefile
+
+{% endhighlight %}
+<p>Write some test case. That is the way, how we verify and be sure that our git class contain package <code>git</code>.</p>
+{% highlight shell %}
+
+$ nano spec/classes/git_spec.rb
+
+require 'spec_helper'
+
+describe 'git', :type => 'class' do
+  context 'install git' do
+    it { should contain_package('git') }
+  end
+end
+
+{% endhighlight %}
+<p>And now we're able to run our test case. Because we are using Gemfile, is very important to run <code>rake spec</code> with <code>bundle</code>! If you're not using <code>bundle</code>, you're not even use Gemfile, so you're not using your specified gems versions! It isn't good practice, so use bundle:</p>
+{% highlight shell %}
+
+$ bundle exec rake spec
+
+/home/niko/.rvm/rubies/ruby-2.1.2/bin/ruby -I/home/niko/.rvm/gems/ruby-2.1.2/gems/rspec-core-3.1.7/lib:/home/niko/.rvm/gems/ruby-2.1.2/gems/rspec-support-3.1.2/lib/home/niko/.rvm/gems/ruby-2.1.2/gems/rspec-core-3.1.7/exe/rspec --pattern spec/\{classes,defines,unit,functions,hosts,integration\}/\*\*/\*_spec.rb --color
+
+Finished in 1.06 seconds (files took 0.78309 seconds to load)
+1 example, 0 failures
+
+{% endhighlight %}
+<h2>Source</h2>
+<p><a href="http://puppetlabs.com/blog/the-next-generation-of-puppet-module-testing" title="Puppet module testing" target="_blank">http://puppetlabs.com/blog/the-next-generation-of-puppet-module-testing</a></p>

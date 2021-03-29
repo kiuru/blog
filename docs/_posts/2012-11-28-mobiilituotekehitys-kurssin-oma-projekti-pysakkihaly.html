@@ -1,0 +1,30 @@
+---
+layout: post
+author: Niko Kiuru
+title: Mobiilituotekehitys -kurssin oma projekti, PysäkkiHäly
+date: 2012-11-28 19:57:23.000000000 +02:00
+categories:
+- Mobiilituotekehitys - BUS4TN008-2
+tags:
+- OpenLayers
+- OpenStreetMap
+permalink: "/2012/11/mobiilituotekehitys-kurssin-oma-projekti-pysakkihaly/"
+---
+<p>Tero Karvisen vetämä mobiilituotekehitys (<a title="Mobiilituotekehitys bus4tn008-2" href="http://terokarvinen.com/2012/aikataulu-mobiilituotekehitys-bus4tn008-2" target="_blank">http://terokarvinen.com/2012/aikataulu-mobiilituotekehitys-bus4tn008-2</a>) -kurssin omaksi projektiksi aion tehdä PysäkkiHälytyksen, joka ilmottaa käyttäjälleen milläin hänen täytyy jäädä julkisenliikenteen ajoneuvosta. Ohjelma toimii vain pääkaupunkiseudulla, koska pysäkkien sijainnit tarjoaa HSL joka on rajoittunut vain pk-seudulle. Tein pienimuotosen "Hei Maailma!" tyyppisen ohjelman OpenLayersin käytöstä.</p>
+<p>Tämä koodi tulostaa näytölle OpenLayersin.<br />
+
+{% highlight html %}
+<!DOCTYPE HTML><br />
+<title>OpenLayers Simplest Example</title><br />
+<div id="demoMap" style="height:250px"></div><br />
+<script src="http://www.openlayers.org/api/OpenLayers.js"></script><br />
+<script><br />
+    map = new OpenLayers.Map("demoMap");<br />
+    map.addLayer(new OpenLayers.Layer.OSM());<br />
+    map.zoomToMaxExtent();<br />
+</script><br />
+{% endhighlight %}
+
+Lähde: OpenLayers <a title="Openlayers hei maailma esimerkki" href="http://wiki.openstreetmap.org/wiki/OpenLayers_Simple_Example" target="_blank">http://wiki.openstreetmap.org/wiki/OpenLayers_Simple_Example</a></p>
+<p>Kilpailijakatsaus:<br />
+Reittioppaan tyyppinen kännykkäsovellus nimeltään Andropas sekä pysäkkihälytystä mainostava Droidpas ovat lähimmät kilpailukumppanit.</p>

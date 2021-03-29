@@ -1,0 +1,36 @@
+---
+layout: post
+author: Niko Kiuru
+title: How to install Ruby on Windows
+date: 2014-10-15 21:27:16.000000000 +03:00
+categories: []
+tags:
+- Ruby
+- windows
+permalink: "/2014/10/how-to-install-ruby-on-windows/"
+---
+<p>In this post, I'll tell how you can install Ruby script language on Windows.<br />
+This post is made for 64-bits architecture's, but 32-bits is installing mostly same way.</p>
+<h2>Download and install</h2>
+<p>1. Download Ruby 2.0.0 x64 (http://rubyinstaller.org/downloads/).<br />
+2. Double click Ruby setup icon, and follow setup wizard to forward. HOX! Remember tap on "Add Ruby executables to your PATH".<br />
+3. When setup is complete, run next command by command line:</p>
+{% highlight shell %}
+
+> ruby -v
+
+{% endhighlight %}
+<p>If you got response like: <code>ruby 2.0.0p481</code>, congratulations your Ruby works correctly! If not.. damn, then something went wrong..</p>
+<h2>Ruby DevKit</h2>
+<p>Ruby could use some native C/C++ extensions, so we need to install Ruby DevKit to get Ruby working as we would like it work.</p>
+<p>Download Ruby development kit (http://rubyinstaller.org/downloads/), and extract it into Ruby path root (C:\Ruby200-x64\DevKit\).</p>
+<p>Run next commands on command line:</p>
+{% highlight shell %}
+
+> cd C:\Ruby200-x64\DevKit\
+> ruby dk.rb init
+> echo -- C:\Ruby200-x64 >> config.yml
+> ruby dk.rb install
+
+{% endhighlight %}
+<p>Now you should are able to run native C/C++ extensions by Ruby.</p>

@@ -1,0 +1,87 @@
+---
+layout: post
+author: Niko Kiuru
+title: Minun metapaketti
+date: 2013-09-26 18:19:31.000000000 +03:00
+categories:
+- Linux palvelimena - ICT4TN003
+tags:
+- deb
+- equivs
+- lintian
+- metapaketti
+permalink: "/2013/09/minun-metapaketti/"
+---
+<p>Tämä artikkeli on kirjoitettu Tero Karvisen <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linux-palvelimena-ict4tn003-9-ja-10-syksylla-2013" target="_blank">Linux palvelimena</a> kurssin tämän viikon tehtäväksi.<br />
+Tehtäväksi sain:</p>
+<p>1. Kerätä kokoon suosikki ohjelmani<br />
+2. Tehdä asennettavista ohjelmista metapaketti<br />
+3. Paketoida metapaketti asennustiedostoksi</p>
+<p>1. Ohjelmiksi valitsin:<br />
+firefox, gedit, apache2, mysql-server, mysql-client ja ssh-server</p>
+<h2> Asennetaan equivs</h2>
+{% highlight shell %}
+
+$ sudo apt-get update
+$ sudo apt-get -y install equivs
+
+{% endhighlight %}
+<h2>Valmistellaan metapaketti</h2>
+<p>Seuraavaksi määritellään metapaketin conffi tiedosto, ja annetaan paketille nimi nikos-apps:</p>
+{% highlight shell %}
+$ equivs-control nikos-apps.cfg
+{% endhighlight %}
+<p>Seuraavaksi muokataan “Package”, “Version”, “Depends” ja "Description" kohtia (Muistathan poistaa kommenttimerkin # rivien edestä). Tiedoston voimme avata muokattavaksi esimerkiksi nanolla:</p>
+{% highlight shell %}
+$ nano nikos-apps.cfg
+{% endhighlight %}
+<p>Muokkaamalla vain yllämainittuja rivejä, ja poistamalla turhat rivit pois, saamme aikaan seuraavanlaisen tiedoston:</p>
+{% highlight shell %}
+
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+
+Package: nikos-apps
+Version: 0.1
+Maintainer: Niko Kiuru <niko@kiuru.net>
+Depends: firefox, gedit, apache2, php5, libapache2-mod-php5, mysql-server, mysql-client, ssh-server
+Description: This package include all my favorite softwares and servers.
+ .
+ Try it yourself.
+
+{% endhighlight %}
+<h2>Luodaan metapaketti</h2>
+{% highlight shell %}
+$ equivs-build nikos-apps.cfg
+{% endhighlight %}
+<p>ja se muodostaa tiedoston: <strong>nikos-apps_0.1_all.deb</strong></p>
+<h2>Metapaketin tarkistus</h2>
+<p>Metapaketin synnyttyä tarkastetaan se vielä lintianilla mahdollisista virheistä:</p>
+{% highlight shell %}
+$ lintian nikos-apps_0.1_all.deb
+{% endhighlight %}
+<p>Virheiltä vältyttiin tällä kertaa, ja paketti on valmiina asennukseen.<br />
+Paketin saat asennettua komennolla:</p>
+{% highlight shell %}
+$ gdebi -n nikos-apps_0.1_all.deb
+{% endhighlight %}
+<h2>Asennus skripti</h2>
+<p>3. Tehdään skripti, joka asentaa meidän metapaketin, ja laittaa php:n toimintakuntoon:</p>
+{% highlight shell %}
+$ nano install_nikos-apps.sh
+{% endhighlight %}
+<p>Ja kirjoitetaan tiedostoon:</p>
+{% highlight shell %}
+
+#!/bin/bash
+apt-get update
+gdebi -n nikos-apps_0.1_all.deb
+a2enmod php5
+service apahce2 restart
+
+{% endhighlight %}
+<p>Ohjelmat saa nyt asennettua komennolla:</p>
+{% highlight shell %}
+$ sudo sh install_nikos-apps.sh
+{% endhighlight %}

@@ -1,0 +1,151 @@
+---
+layout: post
+author: Niko Kiuru
+title: How to generate GPG keys and encrypt files
+description: GNU Privacy Guard or better known as GPG is public key cryptography.
+  This post shows how to generate new GPG key pairs and encrypt and signature files.
+keywords: encrypt
+date: 2015-10-05 20:17:41.000000000 +03:00
+categories: []
+tags:
+- decrypt
+- encrypt
+- GPG
+permalink: "/2015/10/how-to-generate-gpg-keys-and-encrypt-files/"
+---
+<p>GNU Privacy Guard or better known as GPG is public key cryptography implementation and it is free software replacement for the Symantec&#8217;s PGP cryptographic.<br />
+In this post I will show you how to generate new GPG key pairs and encrypt or/and signature files.</p>
+
+<h2>Generate new GPG key pair</h2>
+
+<p>At beginning we have to generate public and private key pair using <code>gpg --gen-key</code>. This introductions follow way how I did my GPG keys, but if you would like to know more about every step I recommend go to look at <a href="https://fedoraproject.org/wiki/Creating_GPG_Keys">https://fedoraproject.org/wiki/Creating_GPG_Keys</a>.</p>
+
+{% highlight shell %}
+$ gpg --gen-key
+gpg (GnuPG) 1.4.16; Copyright (C) 2013 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Please select what kind of key you want:
+   (1) RSA and RSA (default)
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+Your selection?
+{% endhighlight %}
+
+<p>Select 1 (default) and press <strong>Enter</strong>.</p>
+{% highlight shell %}
+RSA keys may be between 1024 and 4096 bits long.
+What keysize do you want? (2048)
+{% endhighlight %}
+
+<p>Default 2048 bits long key enough for me, so I press <strong>Enter</strong>.</p>
+
+{% highlight shell %}
+Please specify how long the key should be valid.
+         0 = key does not expire
+      <n>  = key expires in n days
+      <n>w = key expires in n weeks
+      <n>m = key expires in n months
+      <n>y = key expires in n years
+Key is valid for? (0)
+{% endhighlight %}
+
+<p>I use default value 0 (key does not expire).</p>
+
+{% highlight shell %}
+Key does not expire at all
+Is this correct? (y/N)
+{% endhighlight %}
+
+<p>If you also choose no expire, then press <strong>y</strong> and <strong>Enter</strong>.</p>
+
+{% highlight shell %}
+You need a user ID to identify your key; the software constructs the user ID
+from the Real Name, Comment and Email Address in this form:
+    "Heinrich Heine (Der Dichter) <heinrichh@duesseldorf.de>"
+
+Real name: Niko Kiuru
+Email address: niko@kiuru.net
+Comment:You selected this USER-ID:
+    "Niko Kiuru <niko@kiuru.net>"
+
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit?
+{% endhighlight %}
+
+<p>Give your real name, email address and comment section is optional, I left it empty. And when your identify information is inputted, press <strong>O</strong>.<br />
+Now new key pair located in <code>~/.gnupg/</code> -directory.</p>
+
+<h2>List of keys</h2>
+
+<p>When we are created one key in keyring, we can list all our keys to terminal.</p>
+
+{% highlight shell %}
+$ gpg --list-keys
+/home/niko/.gnupg/pubring.gpg
+-----------------------------
+pub   2048R/AAAAXXXX 2015-10-04
+uid                  Niko Kiuru <niko@kiuru.net>
+sub   2048R/BBBBXXXX 2015-10-04
+{% endhighlight %}
+
+<p>Pub section tell us my master key User ID, which are in my option AAAAXXXX.</p>
+
+<h2>Encrypt file</h2>
+
+<p>We are generate new key pair and we are looking for how it looks like from terminal. Now we will encrypt one file.<br />
+First write some text file which we would like to encrypt later.</p>
+
+{% highlight shell %}
+$ echo "Hello GPG! I would like to encrypt this messages" > hello
+$ cat hello
+Hello GPG! I would like to encrypt this messages
+{% endhighlight %}
+
+<p>Okay, now we have a file, and we are wrote some message from there. Next I would like to encrypt and signature that file by my GPG private key. When I encrypt file, I have to specify which is my master key&#8217;s User ID. Command <code>gpg --list-keys</code> show all my keys and I selected my key.</p>
+
+{% highlight shell %}
+$ gpg -r AAAAXXXX -e hello
+{% endhighlight %}
+
+<p>Encrypted file is named by hello.gpg which are binary format encrypted file. There is only one way to open this file, and it is decrypt file by your private key. Next we decrypt this file.</p>
+
+{% highlight shell %}
+$ gpg hello.gpg
+
+You need a passphrase to unlock the secret key for
+user: "Niko Kiuru <niko.kiuru@gmail.com>"
+2048-bit RSA key, ID BBBBXXXX, created 2015-10-04 (main key ID AAAAXXXX)
+
+gpg: encrypted with 2048-bit RSA key, ID BBBBXXXX, created 2015-10-04
+      "Niko Kiuru <niko.kiuru@gmail.com>"
+Hello GPG! I would like to encrypt this messages
+{% endhighlight %}
+
+<p>Print tells that I am signature file by myself, and at the end of print is my encrypted message.</p>
+
+<h2>Simple passphrase protected file</h2>
+
+<p>If you would like to protect some file in simple, you can also use symmetric protection which are protected via passphrase.<br />
+
+Write some file and encrypt it.</p>
+
+{% highlight shell %}
+$ echo "Hello GPG! This file will be passphrase protected." > hello
+$ gpg -c hello
+{% endhighlight %}
+
+<p>Now you have to give some passphrase, and then file hello.gpg is the same file but encrypted. In default gpg use CAST5 cipher algorithm for encrypt symmetric files. You can decrypt hello.gpg by command <code>gpg hello.gpg</code>.</p>
+
+{% highlight shell %}
+$ gpg hello.gpg
+gpg: CAST5 encrypted data
+gpg: encrypted with 1 passphrase
+gpg: WARNING: message was not integrity protected
+{% endhighlight %}
+
+<h2>Source</h2>
+
+<p><a href="https://fedoraproject.org/wiki/Creating_GPG_Keys">https://fedoraproject.org/wiki/Creating_GPG_Keys</a><br />
+<a href="https://stackoverflow.com/questions/5587513/how-to-export-private-secret-asc-key-to-decrypt-gpg-files-in-windows">https://stackoverflow.com/questions/5587513/how-to-export-private-secret-asc-key-to-decrypt-gpg-files-in-windows</a></p>

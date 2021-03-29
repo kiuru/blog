@@ -1,0 +1,42 @@
+---
+layout: post
+author: Niko Kiuru
+title: Apache2 logit ja prosessien seuranta
+date: 2013-09-12 22:41:40.000000000 +03:00
+categories:
+- Linux palvelimena - ICT4TN003
+tags:
+- apache2
+- linux
+- logit
+permalink: "/2013/09/apache2-logit-ja-prosessien-seuranta/"
+---
+<p><strong>Apache2</strong><br />
+Palvelimessa logit ovat yhtiä tärkeimpiä tiedostoja, kun aletaan virhettä etsimään. Logit pitävät yllä myös mitä on tapahtunut, ja niillä voidaan ennustaa mitä tulee tapahtumaan. Otin tähän artikkeliin esimerkkilogiksi seurantaan oman palvelimen apache2 logit.</p>
+<p>Apache logittaa kahteen eri tiedostoon, kahta eri tyyppistä logia. Tiedostot ovat nimeltään error.log ja access.log. Error.log nimensä mukaan pitää sisällään apachen päällä toimivien nettisivujen virheet, kun taas access.log logittaa kaikki apachen yhteydenotot mm. käyttäjän sivunpäivitykset, sivuvaihdot.</p>
+<p>Itselläni pyörii omalla palvelimellani webbisivut, jotka ovat kirjoitettu php:lla. Kävin tarkastelemassa apachen error.logia, ja otin sieltä yhden esimerkki rivin:<br />
+[Thu Sep 12 22:21:14 2013] [error] [client 198.143.xxx.xxx] PHP Notice:  A session had already been started - ignoring session_start() in /var/sivun/osoite/public_html/index.php on line 4</p>
+<p>- Ensimmäiset hakasulut sisältävät ajan milloin virhe on syntynyt ([Thu Sep 12 22:21:14 2013])<br />
+- Toiset hakasulut kertoo että kyseessä on virhe ([error])<br />
+- Kolmannet hakasulut kertoo että kyseessä on asiakasliittymästä aiheutuva virhe, ja sen on aiheutunut kyseisestä ip:stä "198.143.xxx.xxx" (loppu osa sensuroitu) ([client 198.143.xxx.xxx])<br />
+- Neljänneksi kerrotaan virheen syy, jonka on antanut PHP. Virhe ei ole kriittinen, vaan huomio. PHP antaa huomautuksen että sessio jota yritin luoda, on jo olemassa, ja PHP ei ota huomioon antamaani session_start() funktiota, joka löytyy paikasta /var/sivun/osoite/public_html/index.php ja riviltä 4. Tuosta ilmoituksesta minun on helppo päätellä, että käyttäjä tulee saamaan session_start():n kahdesti yhdellä sivunlatauksella, joka ei ole tarpeellista.</p>
+<p><strong>Prosessien seuranta</strong><br />
+Saat kaikki palvelimesi prosessit näkyviin komennolla:</p>
+{% highlight shell %}
+
+$ sudo ps x
+
+{% endhighlight %}
+<p>Jokainen käynnissä oleva prosessi on identifikoitu numerolla. Näitä numeroita kutsutaan PID:ksi, joka tulee englanninkielisestä sanasta Process Identifier.<br />
+Palvelimen ylläpitäjänä, sinulla on oikeus hallita näitä prosesseja, käynnistää / lopettaa niitä, kuin vain haluat.<br />
+ps x antoi minulle seuraavanlaisen viimeisen rivin:<br />
+1870 pts/0    R+     0:00 ps x</p>
+<p>Tärkeimmät kohdat tuossa on ensimmäinen ja viimeinen kohta. Ensimmäinen kertoo mikä on prosessin PID-arvo, ja viimeinen prosessin nimen. Prosessi siis oli juuri antamani komento, joka näkyi myös hetken kyseisenä prosessina. Voimme yrittää sulkea prosessin käskyllä:</p>
+{% highlight shell %}
+
+$ sudo kill -9 1870
+
+{% endhighlight %}
+<p>Komento todennäköisesti antaa seuraavan ilmoituksen:<br />
+bash: kill: (1870) - No such process</p>
+<p>Kyseinen ilmoitus johtuu siitä, että ps x oli jo ehtinyt lopettaa itse prosessinsa, kun oli saanut prosession tiedot tulostettua näytöllesi. Kun saamme kyseisen ilmoituksen, voimme olla myös varmoja, että kyseinen prosessi on onnistuneesti lopetettu.</p>

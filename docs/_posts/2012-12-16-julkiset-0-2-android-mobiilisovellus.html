@@ -1,0 +1,29 @@
+---
+layout: post
+author: Niko Kiuru
+title: Julkiset 0.2 Android-mobiilisovellus
+keywords: OpenLayers, OpenStreetMap, PhoneGap, Julkiset, reittiopas, Android
+date: 2012-12-16 23:38:54.000000000 +02:00
+categories:
+- Mobiilituotekehitys - BUS4TN008-2
+tags:
+- android
+- OpenLayers
+- OpenStreetMap
+- phonegap
+permalink: "/2012/12/julkiset-0-2-android-mobiilisovellus/"
+---
+<p>Julkiset on pk-seudun julkiseenliikenteeseen suunnattu mobiilipalvelu, joka toimii reittioppaan tavoin. Julkiset -sovelluksen uutena ominaisuutena on pysäkkihälytys. Julkiset-sovelluksen kehittymistä voit seurata tästä blogista tai lataamalla sovelluksen Google Play:stä.</p>
+<p>Sovelluksen kehittäminen aloitettiin 1.12. jolloin lähdin listaamaan sovelluksessa tarvittavat toiminnot. Samalla harjoittelin myös OpenLayersin käyttöä, ja kokeilin kuinka se istuu kännykän näytölle. Tein myös muita pienempiä projekteja OpenLayersin kanssa, ja julkaisin siitä muutaman myös tänne luettavaksi.</p>
+<p>5.12-9.12. Aloin kokoamaan osia yhteen, ja hakemaan kaikkia toimintoja. Ongelmitta ei myöskään selvitty. Ensinä heti tuli esille, etten koneeltani saanut haetuksi reittioppaan API:sta mitään. Ongelman syyksi myöhemmin selvisi Same Origin Policy, joka estää käyttäjän tehdä cross-domain pyyntöjä. PhoneGap:llä Same Policy Origin salli oletuksena kaikki yhteydet, ja niitä pystyi myös helposti hallinnoimaan whitelist:stä. Sain kuitenkin lokaalisti firefoxilla haettua dataa normaalisti, ja näin pystyttiin jatkamaan debuggaamista tietokoneelta käsin.</p>
+<p>10.12-13.12. Aloin keskittymään hieman ulkoasuun, jotta saisin 13.12. järjestettävään sovelluksien demo-tilaisuuteen toimivan ja näyttökelpoisen version valmiiksi. Valitsin ulkoasuksi jQueryMobilen, jolla saa helposti hienoja kännykkäkäyttöliittymiä tehdyksi. Ongelmaksi kuitenkin piakkoin astui yhteensopivuus ongelma OpenLayersin kanssa. Löysin pitkän etsinnän jälkeen jonkin näköisen fiksin, kuinka tämän sai korjatuksi.</p>
+<p>14.12-16.12. Jatkoin kehittämistä, jotta saisin sunnuntaille version jonka saisin julkaistua Google Play:hin, ja palautettua sen Terolle mobiilituotekehitys kurssin pitäjälle. Paikannuksessa tuli jotain hämäriä ongelmia, etten saanut käyttäjän sen hetkistä sijaintia millään selvitettyä. Jouduin ensimmäiseen beta-version näin ollen julkaisemaan ilman pysäkkihälytystä. Kehitys jatkuu ensi viikolla, jolloin tavoitteena on saada toimiva kunnon versio jakeluun.</p>
+<p>Nimi: Julkiset<br />
+Kuvaus: Julkiset on pk-seudun julkiseen liikenteeseen suunnattu mobiilipalvelu, joka toimii reittioppaan tavoin. Julkiset -sovelluksen uutena ominaisuutena on pysäkkihälytys (ei toiminnassa vielä beta-vaiheessa).<br />
+Status: beta<br />
+Asennuspaketti: <a title="julkiset.apk" href="http://nikokiuru.com/apk/julkiset20.apk">http://nikokiuru.com/apk/julkiset20.apk</a><br />
+Lähdekoodit: <a title="github repository" href="https://github.com/kiuru/Julkiset">https://github.com/kiuru/Julkiset</a><br />
+Google Play: <a title="Julkiset for Google Play" href="https://play.google.com/store/apps/details?id=com.nikokiuru.julkiset" target="_blank">https://play.google.com/store/apps/details?id=com.nikokiuru.julkiset</a><br />
+Tekinen toteutus: Sovellus hakee reittitiedot hsl:n reittiopas api:sta, ja tulostaa eri välipysäkit kartalle. Ohjelma käyttää hyväkseen OpenLayerssiä, joka tulostaa näytölle OpenStreetMapin. Ulkoasu on toteutettu jQueryMobilella.<br />
+Ruutukaappaus:</p>
+<p><a href="http://nikokiuru.com/2012/12/julkiset-0-2-android-mobiilisovellus/screenshot_2012-12-16-19-23-33/" rel="attachment wp-att-293"><img class="alignnone size-medium wp-image-293" alt="Screenshot_2012-12-16-19-23-33" src="{{ site.baseurl }}/assets/2012/12/Screenshot_2012-12-16-19-23-33-168x300.png" width="168" height="300" /></a>:<a href="http://nikokiuru.com/2012/12/julkiset-0-2-android-mobiilisovellus/screenshot_2012-12-16-19-23-53/" rel="attachment wp-att-289"><img class="alignnone size-medium wp-image-289" alt="Screenshot_2012-12-16-19-23-53" src="{{ site.baseurl }}/assets/2012/12/Screenshot_2012-12-16-19-23-53-168x300.png" width="168" height="300" /></a> <a href="http://nikokiuru.com/2012/12/julkiset-0-2-android-mobiilisovellus/screenshot_2012-12-16-19-24-37/" rel="attachment wp-att-290"><img class="alignnone size-medium wp-image-290" alt="Screenshot_2012-12-16-19-24-37" src="{{ site.baseurl }}/assets/2012/12/Screenshot_2012-12-16-19-24-37-168x300.png" width="168" height="300" /></a> <a href="http://nikokiuru.com/2012/12/julkiset-0-2-android-mobiilisovellus/screenshot_2012-12-16-19-24-47/" rel="attachment wp-att-291"><img class="alignnone size-medium wp-image-291" alt="Screenshot_2012-12-16-19-24-47" src="{{ site.baseurl }}/assets/2012/12/Screenshot_2012-12-16-19-24-47-168x300.png" width="168" height="300" /></a></p>

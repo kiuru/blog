@@ -1,0 +1,38 @@
+---
+layout: post
+author: Niko Kiuru
+title: Minun ensimmäinen PhoneGap Android-ohjelma
+keywords: phonegap, android, application, openlayer, openstreetmap
+date: 2012-10-31 22:36:50.000000000 +02:00
+categories:
+- Mobiilituotekehitys - BUS4TN008-2
+tags:
+- android
+- OpenLayers
+- OpenStreetMap
+- phonegap
+permalink: "/2012/10/minun-ensimmainen-phonegap-android-ohjelma/"
+---
+<p>Aloitin Tero Karvisen vetämän mobiilituotekehitys kurssin (<a title="Kurssin sivut" href="http://terokarvinen.com/2012/aikataulu-mobiilituotekehitys-bus4tn008-2" target="_blank">Kurssin sivut</a>), jossa harjoittelemme PhonenGapin käyttöä ja applicaatioiden tekemistä mobiililaitteille. Ensimmäisen viikon tehtäväksi saimme tehdä omavalintaisen ensimmäisen ohjelman. Ensimmäinen ohjelma tietty oli Hello World, jonka tekemiseen löytyvät ohjeet Teron kotisivuilta: <a title="Hello PhoneGap" href="http://terokarvinen.com/2012/hello-phonegap-from-xubuntu-12-04-live-cd" target="_blank">http://terokarvinen.com/2012/hello-phonegap-from-xubuntu-12-04-live-cd</a>.</p>
+<p>Hello Worldin lisäksi kokeilin vielä kuinka näppärästi OpenStreetMapin sai näytetyksi kännykän näytölle. Alkuperänen tarkoitus oli rakentaa ohjelma, joka hyväksikäyttää <a title="TieInfo API" href="http://tieinfo.mustcode.fi/tieinfo/" target="_blank">TieInfon</a> json-rajapintaa, josta olisin saanut koko Suomen kattavan sää mittauspisteiden datat. Kuitenkin monien yritysten jälkeen en saanut jostain syystä javascriptillä haettua yhtikäs mitään dataa. Ongelma ei vielä ehtinyt ratketa, mutta tulen myöhemmin päivittämään mistä se jäi kiinni.</p>
+<p>Mutta itse OpenStreetMap ohjelman tekoon. Aluksi sinun tarvitsee hakea OpenLayer.js -kirjasto osoitteesta: <a title="OpenLayer" href="http://openlayers.org/download/OpenLayers-2.12.tar.gz" target="_blank">http://openlayers.org/download/OpenLayers-2.12.tar.gz</a> ja viedä se assets/www/OpenLayers-2.12 -hakemistoon. Seuraavaksi lisäät seuraavan koodin index.html.</p>
+{% highlight html %}
+<!DOCTYPE HTML>
+<title>OpenLayers Simplest Example</title>
+<div id="demoMap" style="height:250px"></div>
+<script type="text/javascript" src="OpenLayers-2.12/OpenLayers.js">
+<script>
+    map = new OpenLayers.Map("demoMap");
+    map.addLayer(new OpenLayers.Layer.OSM());
+    map.zoomToMaxExtent();
+</script>
+{% endhighlight %}
+
+<p>Seuraavaksi voit ajaa koodin ja sinulle generoituu valmis ohjelma, joka näyttää vain OpenStreetMapin. Ohjelmaan olisi hyvin voinut lisätä vielä paikannuksen, mutta sisäoloissa en joko saanut kännykälläni gps yhteyttä taikka se ei muuten vain pelittänyt. Kokeillaan myöhemmin uudemman kerran.</p>
+<p>Nimi: Kartta<br />
+Kuvaus: Ohjelma näyttää OpenStreetMapin<br />
+Status: alpha<br />
+Lisenssi: GPL v2<br />
+Asennuspaketti: <a title="Kartta.apk" href="http://myy.haaga-helia.fi/~a1102088/mobiilituotekehitys/Kartta.apk" target="_blank">http://myy.haaga-helia.fi/~a1102088/mobiilituotekehitys/Kartta.apk</a><br />
+Lähdekoodit: Näkyvissä ylhäällä<br />
+Tekinen toteutus: Ohjelma avaa OpenLayerin, joka näyttää OpenStreetMap:n kartan.</p>

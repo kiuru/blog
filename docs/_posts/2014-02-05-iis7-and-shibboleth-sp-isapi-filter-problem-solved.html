@@ -1,0 +1,49 @@
+---
+layout: post
+author: Niko Kiuru
+title: IIS7 and Shibboleth SP - ISAPI filter problem solved
+keywords: Shibboleth SP
+description: 'Shibboleth SP shows error: "check ISAPI mappings in SP configuration"'
+date: 2014-02-05 15:43:36.000000000 +02:00
+categories: []
+tags:
+- IIS7
+- isapi
+- service provider
+- shibboleth
+- windows server
+permalink: "/2014/02/iis7-and-shibboleth-sp-isapi-filter-problem-solved/"
+---
+<p>Past two weeks I had trying to install Shibboleth Service Provider to my 64-bit Windows Server 2008 R2 and finally it works. I had following Shibboleth installation introductions <a title="Native SP Windows IIS7 Installer" href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPWindowsIIS7Installer" target="_blank">https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPWindowsIIS7Installer</a>, but I got error "check ISAPI mappings in SP configuration". In bottom is solution how I configured shibboleth and what was the solution which makes it work.</p>
+<h2>Workflow</h2>
+<p>1. At first I install IIS7, ISAPI Extensions and ISAPI Filters.<br />
+2. I Created new Web Site and setup bindings. Test site is works correctly by opening binded site in my web browser.<br />
+3. I downloaded Shibboleth SP 2.5.3 64-bit and installed it by default values.<br />
+4. I added ISAPI Filters name: Shibboleth, file: C:\opt\shibboleth-sp\lib64\shibboleth\isapi_shib.dll.<br />
+5. I added Handler Mappings -> Add Script Map -> Request path: <strong>*.sso</strong>, Executable: <strong>C:\opt\shibboleth-sp\lib64\shibboleth\isapi_shib.dll</strong>, Name: Shibboleth SP.<br />
+6. I allowed isapi_shib.dll in ISAPI and CGI Restrictions: add... -> ISAPI or CGI path: <strong>C:\opt\shibboleth-sp\lib64\shibboleth\isapi_shib.dll</strong>, Description: Shibboleth SP.</p>
+<h2>Problem</h2>
+<p>All that on above is in Shibboleth official installation guide. So I should believe everything is work as well now, and I could begin to test my Shibboleth SP, but no. It gives me the following error:</p>
+{% highlight shell %}
+Shibboleth Error
+
+Shibboleth Extension not configured for web site (check ISAPI mappings in SP configuration).
+{% endhighlight %}
+<p>I opened Windows Event Viewer, and found the following error in there:</p>
+{% highlight shell %}
+The description for Event ID 7701 from source Shibboleth ISAPI Filter cannot be found. Either the component that raises this event is not installed on your local computer or the installation is corrupted. You can install or repair the component on the local computer.
+
+If the event originated on another computer, the display information had to be saved with the event.
+
+The following information was included with the event: 
+
+Filter shut down...
+{% endhighlight %}
+<h2>Solution</h2>
+<p>Finally two weeks later I got it works. All what you need is to modify <strong>shibboleth2.xml</strong> which located in <strong>C:\opt\shibboleth-sp\etc\shibboleth\</strong>. You have to override sp.example.com to your domain, and set <strong>IIS Instance ID</strong>.</p>
+<p>In default shibboleth2.xml IIS Instance number is 1. My just before created IIS Web Sites instanceID is doesn't number 1, because ID number 1 is the IIS's default web site ID. As like me the correct number was 2. If you have multiple IIS web sites, you should look at your instances id by following command in command line:</p>
+{% highlight shell %}
+%systemroot%\system32\inetsrv\APPCMD list site <SiteName>
+{% endhighlight %}
+<h2>Source</h2>
+<p><a href="http://stackoverflow.com/a/12296429" target="_blank">http://stackoverflow.com/a/12296429</a></p>

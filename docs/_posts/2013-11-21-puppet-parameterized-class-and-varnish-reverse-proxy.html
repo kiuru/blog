@@ -1,0 +1,135 @@
+---
+layout: post
+author: Niko Kiuru
+title: Puppet parameterized class and Varnish reverse proxy
+date: 2013-11-21 21:29:56.000000000 +02:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- Puppet
+- reverse proxy
+- Ubuntu
+- Varnish
+permalink: "/2013/11/puppet-parameterized-class-and-varnish-reverse-proxy/"
+---
+<p>I am writing this post as part of course <a href="http://terokarvinen.com/2013/aikataulu-–-linuxin-keskitetty-hallinta-–-ict4tn011-4-syksylla-2013" target="_blank">Linuxin keskitetty hallinta</a> held by Tero Karvinen. In this article I will install Varnish reverse proxy and change its port by Puppet parametrized class. Double weeks ago I did article for how you install Apache with Puppet: <a href="http://nikokiuru.com/2013/11/puppet-package-file-service-example/">http://nikokiuru.com/2013/11/puppet-package-file-service-example/</a>.</p>
+<h2>Create new module</h2>
+<p>Remember first start by hello world! <a href="http://nikokiuru.com/2013/11/hello-puppet/">http://nikokiuru.com/2013/11/hello-puppet/</a></p>
+{% highlight shell %}
+
+$ mkdir -p modules/varnishd/manifests/
+$ nano modules/varnishd/manifests/init.pp
+
+{% endhighlight %}
+<p>Code in init.pp:</p>
+{% highlight shell %}
+
+class varnishd ($varnish_port = 80, $backend_port = 8080) {
+
+  package {"varnish":
+    ensure => "installed",
+  }
+
+  service {"varnish":
+    ensure => "running",
+    enable => "true",
+    require => Package["varnish"],
+  }
+
+}
+
+{% endhighlight %}
+<p>Run module:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"varnishd":}'
+
+{% endhighlight %}
+<h2>Create templates</h2>
+<p>First copy and modify varnish default config-file:</p>
+{% highlight shell %}
+
+$ mkdir modules/varnishd/templates/
+$ cp /etc/default/varnish modules/varnishd/templates/varnish.erb
+$ nano modules/varnishd/templates/varnish.erb
+
+{% endhighlight %}
+<p>Change port 6081 to variable @varnish_port:</p>
+{% highlight shell %}
+
+DAEMON_OPTS="-a :<%= @varnish_port %> \
+
+{% endhighlight %}
+<p>And next copy and modify varnish backend service config-file:</p>
+{% highlight shell %}
+
+$ cp /etc/varnish/default.vcl modules/varnishd/templates/default.vcl.erb
+$ nano modules/varnishd/templates/default.vcl.erb
+
+{% endhighlight %}
+<p>Change backend port to variable @backend_port:</p>
+{% highlight shell %}
+
+.port = "<%= @backend_port %>";
+
+{% endhighlight %}
+<p>And last add two file method in init.pp</p>
+{% highlight shell %}
+
+$ nano modules/varnishd/manifests/init.pp
+
+{% endhighlight %}
+<p>And code in init.pp:</p>
+{% highlight shell %}
+
+class varnishd ($varnish_port = 80, $backend_port = 8080) {
+  package {"varnish":
+    ensure => "installed",
+  }
+
+  service {"varnish":
+    ensure => "running",
+    enable => "true",
+    require => Package["varnish"],
+  }
+
+  file { "/etc/default/varnish":
+    content => template("varnishd/varnish.erb"),
+  }
+
+  file { "/etc/varnish/default.vcl":
+    content => template("varnishd/default.vcl.erb"),
+  }
+
+}
+
+{% endhighlight %}
+<p>Finally run command:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"varnishd":}'
+
+{% endhighlight %}
+<h2>Test</h2>
+{% highlight shell %}
+
+$ curl -I localhost
+
+{% endhighlight %}
+<p>Result:</p>
+{% highlight shell %}
+
+HTTP/1.1 200 OK
+Server: Apache/2.2.22 (Ubuntu)
+Last-Modified: Thu, 21 Nov 2013 19:08:06 GMT
+ETag: "c40836-d-4ebb49e1a8e3c"
+Vary: Accept-Encoding
+Content-Type: text/html
+Transfer-Encoding: chunked
+Date: Thu, 21 Nov 2013 19:29:59 GMT
+X-Varnish: 1215889787
+Age: 0
+Via: 1.1 varnish
+Connection: keep-alive
+
+{% endhighlight %}

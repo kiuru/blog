@@ -1,0 +1,72 @@
+---
+layout: post
+author: Niko Kiuru
+title: Hide Apache server signature
+keywords: Apache server signature
+description: Instructions how to hide unnecessary Apache server signature
+  from HTTP header and reach better security for your server.
+date: 2015-05-18 19:11:40.000000000 +03:00
+categories: []
+tags:
+- Apache
+- php
+- Ubuntu
+permalink: "/2015/05/hide-apache-server-signature/"
+---
+<p>In default Apache write server signatures to HTTP-responses. In production server this is not recommended action, because it gives more attacking area to criminals. Web servers would like to advice themselves and that is the reason why they add their signatures in default to HTTP-responses.</p>
+<p>In this post I will show you how to hide unnecessary Apache server signature.</p>
+<p>Tested on Ubuntu 14.04 and Ubuntu 12.04.</p>
+<h2>At beginning</h2>
+<p>you can watch how your server HTTP-response looks like now. Do HTTP-request e.g. with curl:</p>
+{% highlight shell %}
+
+$ curl -I http://yourdomain.com
+
+{% endhighlight %}
+<p>There is your HTTP-header and now you see exactly what all informations Apache gives to client. We still want to limit information of our server from outside.</p>
+<h2>Hide Apache signatures</h2>
+<p>At first open Apache configuration file <code>apache2.conf</code></p>
+{% highlight shell %}
+
+$ sudoedit /etc/apache2/apache2.conf
+
+{% endhighlight %}
+<p>Add two lines on below to <code>apache2.conf</code></p>
+{% highlight shell %}
+
+ServerTokens Prod
+ServerSignature Off
+
+{% endhighlight %}
+<p>Save file and reload Apache daemon</p>
+{% highlight shell %}
+
+$ sudo service apache2 reload
+
+{% endhighlight %}
+<h2>Hide also information of PHP</h2>
+<p>If you are using PHP HTTP-header also contain some information of PHP. Here is the way how to hide it.</p>
+<p>Open <code>php.ini</code></p>
+{% highlight shell %}
+
+$ sudoedit /etc/php5/apache2/php.ini
+
+{% endhighlight %}
+<p>In default <code>expose_php</code> is set to On, but now you take it Off</p>
+{% highlight shell %}
+
+; Decides whether PHP may expose the fact that it is installed on the server
+; (e.g. by adding its signature to the Web server header).  It is no security
+; threat in any way, but it makes it possible to determine whether you use PHP
+; on your server or not.
+; http://php.net/expose-php
+expose_php = Off
+
+{% endhighlight %}
+<p>After changes you have to reload Apache</p>
+{% highlight shell %}
+
+$ sudo service apache2 reload
+
+{% endhighlight %}
+<p>Now you're a little further safe.</p>

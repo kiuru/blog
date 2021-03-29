@@ -1,0 +1,227 @@
+---
+layout: post
+author: Niko Kiuru
+title: Oman vieraskirjan tekeminen php:lla
+date: 2011-09-14 22:57:31.000000000 +03:00
+categories:
+- Courses
+- Työasemat ja tietoverkot - ICT1TN002
+tags:
+- php
+permalink: "/2011/09/oman-vieraskirjan-tekeminen-phplla/"
+---
+<p>Seuraavaksi näytän kuinka tehdä oman vieraskirjan käyttäen hyväksi php:ta ja mysql. Teemme 6 eri php sivua, joissa luemme mysql tietokantaa, sekä haiemme talletamme sinne myös tietoa.</p>
+<p>Tähän tarvitaan 6 eri php tiedostoa.</p>
+<p>Ensimmäiseksi luodaan settings niminen kansio, johon tulee settings.php niminen tiedosto. Eli tarkoituksena on kerätä kaikki sivujen asetukset tähän kyseiseen kansioon.<br />
+Tällä palikalla otetaan yhteyttä tietokantaan, jotta voimme myöhäisemmässä vaiheessa antaa sql kyselyitä sinne. (Korjaa tummenetut alueet omilla tiedoilla)</p>
+<p>settings.php<br />
+
+{% highlight php %}
+<?php<br />
+$dbuser="tunnus";<br />
+$dbpass="salasana";<br />
+$dbname="tietokanta";<br />
+//$dbserver="localhost"<br />
+if (!($connect = mysql_connect("localhost", $dbuser, $dbpass)))<br />
+{<br />
+print "Tietokantaan ei saatu yhteyt";<br />
+exit;<br />
+}<br />
+if (!mysql_select_db($dbname))<br />
+{<br />
+print "Tietokannan valita ei onnistunut!";<br />
+exit;<br />
+}<br />
+?><br />
+{% endhighlight %}
+
+<p>Toiseksi teemme etusivu.php, joka näyttää seuraavalta:</p>
+<p>etusivu.php<br />
+
+{% highlight php %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"></p>
+<p><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi"><br />
+<head></p>
+<p><meta http-equiv="content-type" content="text/html; charset=UTF-8" /></p>
+<p><link rel="stylesheet" type="text/css" href="/style/style.css" /></p>
+<p><title>Nikon Vieraskirja</title></p>
+<p><meta http-equiv="content-language" content="fi" /><br />
+<meta name="robots" content="index, follow" /></p>
+<p><!-- Niko Kiuru, TN1PE --></p>
+<p></head><br />
+<body></p>
+<p><p>Vieraskirja:</p><br />
+<?php echo '<a href="editnames.php">Editoi</a>'; ?><br />
+<table><br />
+<form action="lisaavieras.php" method="post"><br />
+<tr><br />
+<td>Nimi:</td><br />
+<td><input type="text" name="name"></td><br />
+</tr><br />
+<tr><br />
+<td>Sukunimi:</td><br />
+<td><input type="text" name="lastname"></td><br />
+</tr><br />
+<tr><br />
+<td></td><br />
+<td><input type="submit" name="send" value="Lähetä"></td><br />
+</tr><br />
+</form><br />
+</table></p>
+<p><?php include("settings/settings.php"); ?><br />
+<?php<br />
+$vlista = mysql_query("SELECT * FROM vieraskirja") or die('Tapahtui Virhe' . mysql_error());</p>
+<p>echo "<table border='1'><br />
+<tr><br />
+<th>ID</th><br />
+<th>Etunimi</th><br />
+<th>Sukunimi</th><br />
+</tr>";</p>
+<p>while($row = mysql_fetch_array($vlista))<br />
+{<br />
+echo "<tr>";<br />
+echo "<td>" . $row['id'] . "</td>";<br />
+echo "<td>" . $row['name'] . "</td>";<br />
+echo "<td>" . $row['lastname'] . "</td>";<br />
+echo "</tr>";<br />
+}<br />
+echo "</table>";</p>
+<p>?></p>
+<p><?php mysql_close($connect); ?></p>
+<p><p><br />
+<a href="http://validator.w3.org/check?uri=referer"> <img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a><br />
+</p></p>
+<p></body><br />
+</html><br />
+{% endhighlight %}
+
+<p>Kolmantena teemme lisaavieras.php tiedoston:</p>
+<p>lisaavieras.php<br />
+
+{% highlight php %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"></p>
+<p><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi"><br />
+<head></p>
+<p><meta http-equiv="content-type" content="text/html; charset=UTF-8" /></p>
+<p><link rel="stylesheet" type="text/css" href="/style/style.css" /></p>
+<p><title>Nikon Vieraskirja</title></p>
+<p><meta http-equiv="content-language" content="fi" /><br />
+<meta name="robots" content="index, follow" /></p>
+<p><!-- Niko Kiuru, TN1PE --></p>
+<p></head><br />
+<body><br />
+<?php include("settings/settings.php"); ?></p>
+<p><?php<br />
+$name = $_POST["name"];<br />
+$lastname = $_POST["lastname"];</p>
+<p>if($name ==""){<br />
+echo "Kirjoita Etunimesi!";<br />
+}<br />
+if($lastname ==""){<br />
+echo "Kirjoita Sukunimesi!";<br />
+}<br />
+else {<br />
+$sql = "INSERT INTO vieraskirja (name, lastname) VALUES ('$name','$lastname')";</p>
+<p>if (!mysql_query($sql,$connect))<br />
+{<br />
+die('Tapahtui Virhe: ' . mysql_error());<br />
+}<br />
+echo "Nimi" . " " . $name . " " . $lastname . " " . "on lisatty listaan! <br /><br />";<br />
+echo '<a href="etusivu.php">Takaisin Etusivulle</a>';<br />
+}</p>
+<p>?></p>
+<p><?php mysql_close($connect); ?></p>
+<p><p><br />
+<!--   <a href="http://validator.w3.org/check?uri=referer"> <img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a>--><br />
+</p></p>
+<p></body><br />
+</html><br />
+{% endhighlight %}
+
+<p>Ja jotta hallinointi sujuisi paremmin, eikä tarvitse räpellellä suoraan tietokannasta, niin tehdään pienimuotoinen hallinointi sivu:</p>
+<p>editnames.php<br />
+
+{% highlight php %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"></p>
+<p><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi"><br />
+<head></p>
+<p><meta http-equiv="content-type" content="text/html; charset=UTF-8" /></p>
+<p><link rel="stylesheet" type="text/css" href="/style/style.css" /></p>
+<p><title>Nikon Vieraskirja</title></p>
+<p><meta http-equiv="content-language" content="fi" /><br />
+<meta name="robots" content="index, follow" /></p>
+<p><!-- Niko Kiuru, TN1PE --></p>
+<p></head><br />
+<body></p>
+<p><p>Vieraskirja:</p><br />
+<?php echo '<a href="etusivu.php">Etusivulle</a>'; ?><br />
+<table><br />
+<form action="editnames2.php" method="post"><br />
+<tr><br />
+<td>Anna poistettavan ID numero:</td><br />
+<td><input type="text" name="id"></td><br />
+</tr><br />
+<td></td><br />
+<td><input type="submit" name="send" value="Poista"</td><br />
+</tr><br />
+</form><br />
+</table></p>
+<p><?php include("settings/settings.php"); ?><br />
+<?php<br />
+$vlista = mysql_query("SELECT * FROM vieraskirja") or die('Tapahtui Virhe' . mysql_error());</p>
+<p>echo "<table border='1'><br />
+<tr><br />
+<th>ID</th><br />
+<th>Etunimi</th><br />
+<th>Sukunimi</th><br />
+</tr>";</p>
+<p>while($row = mysql_fetch_array($vlista))<br />
+{<br />
+echo "<tr>";<br />
+echo "<td>" . $row['id'] . "</td>";<br />
+echo "<td>" . $row['name'] . "</td>";<br />
+echo "<td>" . $row['lastname'] . "</td>";<br />
+echo "</tr>";<br />
+}<br />
+echo "</table>";</p>
+<p>?></p>
+<p><?php mysql_close($connect); ?></p>
+<p><p><br />
+<a href="http://validator.w3.org/check?uri=referer"> <img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a><br />
+</p></p>
+<p></body><br />
+</html><br />
+{% endhighlight %}
+
+<p>Sekä:</p>
+<p>editnames2.php<br />
+
+{% highlight php %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"></p>
+<p><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi"><br />
+<head></p>
+<p><meta http-equiv="content-type" content="text/html; charset=UTF-8" /></p>
+<p><link rel="stylesheet" type="text/css" href="/style/style.css" /></p>
+<p><title>Nikon Vieraskirja</title></p>
+<p><meta http-equiv="content-language" content="fi" /><br />
+<meta name="robots" content="index, follow" /></p>
+<p><!-- Niko Kiuru, TN1PE --></p>
+<p></head><br />
+<body><br />
+<?php include("settings/settings.php");</p>
+<p>$id = $_POST["id"];<br />
+if(is_numeric($id) == false){ die("Eipäs haxata."); }</p>
+<p>$query = mysql_query("SELECT * FROM vieraskirja WHERE id='".$_POST["id"]."'") or die('Tapahtui virhe: ' . mysql_error());<br />
+while($row = mysql_fetch_array($query)){</p>
+<p>echo "Poistit onnistuneesti" . " " . $row["name"] . " " . $row["lastname"];<br />
+echo '<br /><a href="editnames.php">Takaisin Editointi sivulle</a>';</p>
+<p>mysql_query("DELETE FROM vieraskirja WHERE id='".$row["id"]."' LIMIT 1");</p>
+<p>}</p>
+<p>mysql_close($connect);<br />
+?><br />
+</body><br />
+</html><br />
+{% endhighlight %}
+
+<p>Tällätavoin ollaan saatu aikaseksi yksinkertainen vieraskirja. Huomioithan että tässä ohjeessa ei ole salattua hallinnointi sivua, joten kukatahansa voi päästä poistelemaan nimiä! Muistathan suojata sen ennen käyttöä.</p>
+<p>Pari ongelmaa myös on havaittavissa, eli nimeen/sukunimeen pystyy syöttämään numeroita.</p>

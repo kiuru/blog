@@ -1,0 +1,60 @@
+---
+layout: post
+author: Niko Kiuru
+title: Hello Puppet!
+date: 2013-11-10 21:05:25.000000000 +02:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- linux
+- Puppet
+permalink: "/2013/11/hello-puppet/"
+---
+<p>I am writing this post as part of course <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linuxin-keskitetty-hallinta-%E2%80%93-ict4tn011-4-syksylla-2013" target="_blank">Linuxin keskitetty hallinta</a> held by Tero Karvinen. In this post I will write hello world puppet module.</p>
+<h2>Install Puppet</h2>
+{% highlight shell %}
+
+$ sudo apt-get update
+$ sudo apt-get install puppet
+
+{% endhighlight %}
+<p>Puppet oneliner</p>
+{% highlight shell %}
+
+$ puppet apply -e 'file { "/tmp/helloPuppet": content => "Hello Puppet!" }'
+
+{% endhighlight %}
+<h2>Create new hello module</h2>
+{% highlight shell %}
+
+$ mkdir -p modules/hello/manifests/
+$ nano modules/hello/manifests/init.pp
+
+{% endhighlight %}
+<p>Do next class in file init.pp:</p>
+{% highlight shell %}
+
+class hello {
+  file { '/tmp/helloPuppet':
+    content => "Hello Puppet!\nPuppet module working as well!"
+  }
+}
+
+{% endhighlight %}
+<p>Run puppet module:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"hello":}'
+
+{% endhighlight %}
+<p>Last we verify that module works right:</p>
+{% highlight shell %}
+
+$ less /tmp/helloPuppet
+
+{% endhighlight %}
+<h2>Result</h2>
+<p>Hello Puppet!<br />
+Puppet module working as well</p>
+<h2>Source</h2>
+<p><a href="http://terokarvinen.com/2013/hello-puppet-revisited-%E2%80%93-on-ubuntu-12-04-lts" target="_blank">http://terokarvinen.com/2013/hello-puppet-revisited-%E2%80%93-on-ubuntu-12-04-lts</a></p>

@@ -1,0 +1,102 @@
+---
+layout: post
+author: Niko Kiuru
+title: OpenLayers and OpenStreetMap for beginner
+date: 2012-12-03 21:15:16.000000000 +02:00
+categories: []
+tags:
+- OpenLayers
+- OpenStreetMap
+permalink: "/2012/12/openlayers-and-openstreetmap-for-beginner/"
+---
+<p>Add free map your website through this step-by-step tutorial.</p>
+<p><strong>No API key needed.</strong></p>
+
+<h2>Source Code:</h2>
+
+{% highlight html %}
+<div id="map" style="top: 0; left: 0; bottom: 0; right: 0; position: fixed;"></div>
+{% endhighlight %}
+
+Add div #map in your html body.
+
+{% highlight javascript %}
+<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+{% endhighlight %}
+
+Add OpenLayers.js javascript library to html document end of [/body].
+
+{% highlight javascript %}
+var lat            = 60.230506;
+var lon            = 24.847194
+var zoom           = 10;
+{% endhighlight %}
+
+Initialize variables.
+
+{% highlight javascript %}
+var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+{% endhighlight %}
+
+Transform coordinates EPSG position.
+
+{% highlight javascript %}
+var map = new OpenLayers.Map("map");
+{% endhighlight %}
+
+Add new OpenLayers map to div by id #map.
+
+{% highlight html %}
+var mapnik = new OpenLayers.Layer.OSM();
+map.addLayer(mapnik);
+{% endhighlight %}
+
+Add OpenStreetMap background to layer.
+
+{% highlight javascript %}
+var markers = new OpenLayers.Layer.Markers( "Markers" );
+map.addLayer(markers);
+markers.addMarker(new OpenLayers.Marker(position));
+{% endhighlight %}
+
+Add new markers to position you created.
+
+{% highlight javascript %}
+map.setCenter(position, zoom);
+{% endhighlight %}
+
+And finally center map to your created position.
+Whole html file looks like this:
+
+{% highlight html %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>OpenLayers Example</title>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div id="map" style="top: 0; left: 0; bottom: 0; right: 0; position: fixed;"></div>
+		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+		<script>
+			var lat            = 60.230506;
+			var lon            = 24.847194
+			var zoom           = 10;
+			var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+			var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+			var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+			var map = new OpenLayers.Map("map");
+			// Add OpenStreetMap to layer
+			var mapnik         = new OpenLayers.Layer.OSM();
+			map.addLayer(mapnik);
+			// Add markers to layer
+			var markers = new OpenLayers.Layer.Markers( "Markers" );
+			map.addLayer(markers);
+			markers.addMarker(new OpenLayers.Marker(position));</p>
+			map.setCenter(position, zoom);
+		</script>
+	</body>
+</html>
+{% endhighlight %}

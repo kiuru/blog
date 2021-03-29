@@ -1,0 +1,27 @@
+---
+layout: post
+author: Niko Kiuru
+title: Origin null is not allowed by Access-Control-Allow-Origin
+description: Guide for error Origin null is not allowed by Access-Control-Allow-Origin
+keywords: PhoneGap, Cordova, origin null, Same Origin Policy, Access-Control-Allow-Origin,
+  not allowed, JSON, JSONP, jQuery
+date: 2012-12-16 13:55:13.000000000 +02:00
+categories: []
+tags:
+- Cordova
+- cross-domain
+- jQuery
+- JSON
+- JSONP
+- phonegap
+permalink: "/2012/12/origin-null-is-not-allowed-by-access-control-allow-origin/"
+---
+<p>Every developers who coding with javascript will get sooner or later "Origin null" error, when they tried loading json/xml data from their local computer (working in firefox), or from external server. That is not allowed with new modern browsers for better security. You can watch your http request header and see "Origin: null" because browser block automatically these cross-domain request.</p>
+<p>You have some issues to solve this problem:</p>
+<p>1. If target server service JSONP use it. You only have to add param callback=? end of url. "getJSON()" jQuery request add callback parameter automatically.</p>
+<p>2. Install some http-server, and run your javascript code from there. Ex. Linux: Apache2, Windows: Mongoose (only for developing).</p>
+<p>3. Not recommend but could issue which working is try to some older browsers versions where origin policy is not so tight.</p>
+<p>4. This issues still working on firefox:<br />
+Do your cross-domain json request in browser and copy-paste response for file ex. "name.json" and save. Now you can locally get this files working (in jQuery: $.getJSON('name.json')).</p>
+<p>Hox for PhoneGap developers!<br />
+If you made apps with PhoneGap, you can easily develop your app with one trick. Let see this guide: <a title="Cordova Api Whitelist guide" href="http://docs.phonegap.com/en/2.2.0/guide_whitelist_index.md.html#Domain%20Whitelist%20Guide" target="_blank">http://docs.phonegap.com/en/2.2.0/guide_whitelist_index.md.html#Domain%20Whitelist%20Guide</a></p>

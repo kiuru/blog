@@ -1,0 +1,44 @@
+---
+layout: post
+author: Niko Kiuru
+title: Apache ja alidomain
+description: Kuinka asettaa alidomain apache daemonille
+keywords: apache, alidomain, a2ensite, service
+date: 2012-05-24 21:03:29.000000000 +03:00
+categories: []
+tags:
+- Apache
+- linux
+permalink: "/2012/05/apache-ja-alidomain/"
+---
+<p>Tässä artikkelissa kerron kuinka alidomainit sekä usean domainin käyttö samalta ip-osoitteelta saa toimimaan Apachessa. Alidomainin luonti tapoja on muutamia erilaisia riippuen käyttötarkoituskesta. Alla on kuitenkin yksi tapa toteuttaa se.</p>
+<p>Käytössäni on Ubuntu 11.04, ja jotta päästään alkuun otathan huomioon että sinulla on oikeudet tehdä muutoksia seuraaviin kohteisiin:<br />
+1. Sinulla on käyttöjärjestelmän pääkäyttäjän oikeudet.<br />
+2. Pääset käsiksi käyttämäsi domainin nimipalvelimen asetuksiin.</p>
+<p>Seuraavaksi täytyy kirjautua nimipalvelimellesi ja lisätä uusi alidomain osoittamaan sinun ip-osoitetta.<br />
+Esimerkki tilanteesta, jossa luodaan kiekkoliiga.net domainille p -niminen alidomain:</p>
+<p><a href="https://nikokiuru.com/wp-content/uploads/2012/05/dns.png"><img class="size-medium wp-image-154" title="dns" src="{{ site.baseurl }}/assets/2012/05/dns-300x145.png" alt="" width="300" height="145" /></a> Nimipalvelimen asetukset[/caption]</p>
+<p>Kun alidomain on tallennettu nimipalvelimelle tulee siirtyä apachen conffeihin ja luodaan p.kiekkoliiga.net niminen tiedosto.</p>
+
+{% highlight shell %}
+$ cd /etc/apache2/site-available/
+$ nano p.kiekkoliiga.net
+{% endhighlight %}
+
+<p>Kun tiedosto on avattu nanon kirjoitetaan seuraava pätkä sinne:</p>
+
+{% highlight shell %}
+<VirtualHost *:80>
+  ServerName p.kiekkoliiga.net
+  DocumentRoot /var/www/kiekkoliiga/paitsio/
+{% endhighlight %}
+
+<p>(DocumentRoot -kohtaan määrittelet paikan minne alidoimainilla osoitat.)</p>
+<p>Seuraavaksi luotu p.kiekkoliiga.net -tiedosto pitää "hyväksyttää" apachelle. Tämä tapahtuu seuraavasti:</p>
+
+{% highlight shell %}
+$ a2ensite p.kiekkoliiga.net
+$ service apache2 restart
+{% endhighlight %}
+
+<p>Nyt olet onnistuneesti lisännyt uuden alidomainin</p>

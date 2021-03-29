@@ -1,0 +1,43 @@
+---
+layout: post
+author: Niko Kiuru
+title: Wordpress quickly upgrade from command line
+description: Three quickly steps to show how to upgrade Wordpress from
+  command line with necessary backups.
+keywords: upgrade Wordpress
+date: 2015-04-18 13:16:33.000000000 +03:00
+categories: []
+tags:
+- command line
+- wordpress
+permalink: "/2015/04/wordpress-quickly-upgrade-from-command-line/"
+---
+<p>Wordpress has their own guide to <a href="https://codex.wordpress.org/Upgrading_WordPress_-_Extended_Instructions" title="How to upgrade wordpress" target="_blank">upgrade wordpress</a>, but in this post I will show you how I upgrade my all wordpress sites.</p>
+<p>I using Ubuntu 14.04 server and I update wordpress from command line.</p>
+<h1>Backups</h1>
+<p>Before upgrade we backup our database and wordpress directory.</p>
+{% highlight shell %}
+
+$ mkdir -p ~/backup
+$ mysqldump -u user -p <database name> | gzip -9 > ~/backup/$(date +"%Y%m%d")_wordpress.sql.gz
+$ tar -zcvf ~/backup/$(date +"%Y%m%d")_wordpress-dir.tar.gz /home/niko/public_html/
+
+{% endhighlight %}
+<h1>Download wordpress</h1>
+{% highlight shell %}
+$ cd /tmp/
+$ wget https://wordpress.org/latest.zip
+$ unzip latest.zip
+{% endhighlight %}
+<h1>Overwrite all new files</h1>
+<p>Remember change current directory to where wordpress located in your server.</p>
+{% highlight shell %}
+
+$ cd ~/public_html/
+$ cp -avr /tmp/wordpress/* .
+$ rm -rf /tmp/wordpress /tmp/latest.zip
+
+{% endhighlight %}
+<p>Open http://your_domain.com/wp-admin/upgrade.php in a browser and run that script. It makes all needed database conversions. If something fails, you still have your backups in ~/backup/ directory.</p>
+<h2>Source</h2>
+<p><a href="http://www.cyberciti.biz/tips/howto-upgrade-wordpress-from-linux-unix-shell-prompt.html" title="cyberciti - howto upgrade wordpress" target="_blank">http://www.cyberciti.biz/tips/howto-upgrade-wordpress-from-linux-unix-shell-prompt.html</a></p>

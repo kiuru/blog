@@ -1,0 +1,58 @@
+---
+layout: post
+author: Niko Kiuru
+title: Puppet package-file-service example
+date: 2013-11-11 18:08:46.000000000 +02:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- apache2
+- linux
+- Puppet
+permalink: "/2013/11/puppet-package-file-service-example/"
+---
+<p>I am writing this post as part of course <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linuxin-keskitetty-hallinta-%E2%80%93-ict4tn011-4-syksylla-2013" target="_blank">Linuxin keskitetty hallinta</a> held by Tero Karvinen. In this post I will create new package-file-service module and install apache2 by puppet.</p>
+<p>If you need to help for installing puppet I recommend you beginning training puppet here:<br />
+<a href="http://nikokiuru.com/2013/11/hello-puppet/" target="_blank">http://nikokiuru.com/2013/11/hello-puppet/</a></p>
+<p>Otherwise, let's begin to install Apache2 by puppet!</p>
+<h2>Create new module</h2>
+<p>First create new module and init.pp file inside manifests:</p>
+{% highlight shell %}
+
+$ mkdir -p modules/apache2/manifests/
+$ nano modules/apache2/manifests/init.pp
+
+{% endhighlight %}
+<p>And the code in init.pp:</p>
+{% highlight shell %}
+
+class apache2 {
+  package {"apache2":
+    ensure => "installed",
+  }
+
+  service {"apache2":
+    ensure => "running",
+    enable => "true",
+    require => Package["apache2"],
+  }
+}
+
+{% endhighlight %}
+<p>Apply our puppet module by command:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"apache2":}'
+
+{% endhighlight %}
+<h2>Test module</h2>
+<p>We can test that Apache2 is running by command:</p>
+{% highlight shell %}
+
+$ sudo service apache2 status
+
+{% endhighlight %}
+<p>Result:<br />
+Apache2 is running</p>
+<h2>Source</h2>
+<p><a href="http://docs.puppetlabs.com/learning/ordering.html#packagefileservice" target="_blank">http://docs.puppetlabs.com/learning/ordering.html#packagefileservice</a></p>

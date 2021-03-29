@@ -1,0 +1,73 @@
+---
+layout: post
+author: Niko Kiuru
+title: Puppet templates and facter facts hello world
+date: 2013-11-10 21:53:27.000000000 +02:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- facts
+- linux
+- Puppet
+- Ubuntu
+permalink: "/2013/11/puppet-templates-and-facter-facts-hello-worl/"
+---
+<p>I am writing this post as part of course <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linuxin-keskitetty-hallinta-%E2%80%93-ict4tn011-4-syksylla-2013" target="_blank">Linuxin keskitetty hallinta</a> held by Tero Karvinen. In this post I will write hello world module which use puppet templates and facter facts (ex. my hardware details).</p>
+<h2>See your computer details</h2>
+<p>When we run facter command, we will see our computer details. Read more: <a href="http://www.puppetcookbook.com/posts/list-facter-facts.html" target="_blank">http://www.puppetcookbook.com/posts/list-facter-facts.html</a></p>
+{% highlight shell %}
+
+$ facter -p
+
+{% endhighlight %}
+<h2>Create new module</h2>
+<p>Create new view for hardware_details module:</p>
+{% highlight shell %}
+
+$ mkdir -p modules/hardware_details/templates/
+$ nano modules/hardware_details/templates/details.erb
+
+{% endhighlight %}
+<p>The code in details.erb:</p>
+{% highlight shell %}
+
+Hardware model: <%= @hardwaremodel %>
+Kernel version: <%= @kernelmajversion %>
+Puppet version: <%= @puppetversion %>
+Ruby version: <%= @rubyversion %>
+
+{% endhighlight %}
+<p>Create new directory:</p>
+{% highlight shell %}
+
+$ mkdir modules/hardware_details/manifests
+
+{% endhighlight %}
+<p>Do next class in file modules/hardware_details/manifests/init.pp:</p>
+{% highlight shell %}
+
+class hardware_details {
+  file { '/tmp/hardwareDetail':
+    content => template('hardware_details/details.erb'),
+  }
+}
+
+{% endhighlight %}
+<p>Run puppet module:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"hardware_details":}'
+
+{% endhighlight %}
+<h2>Test module</h2>
+<p>Last we verify that module works right:</p>
+{% highlight shell %}
+
+$ less /tmp/hardwareDetails
+
+{% endhighlight %}
+<p>My result:<br />
+Hardware model: x86_64<br />
+Kernel version: 3.2<br />
+Puppet version: 2.7.11<br />
+Ruby version: 1.8.7</p>

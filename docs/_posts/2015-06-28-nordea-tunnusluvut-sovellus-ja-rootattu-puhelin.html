@@ -1,0 +1,76 @@
+---
+layout: post
+author: Niko Kiuru
+title: Nordea tunnusluvut-sovellus ja rootattu puhelin
+description: Käyn kirjoituksessa läpi kuinka saat käyttöönotettua Nordea
+  tunnusluvut-sovelluksen rootatussa Android-puhelimessa. Lue lisää!
+keywords: tunnusluvut
+date: 2015-06-28 20:07:46.000000000 +03:00
+categories: []
+tags: []
+permalink: "/2015/06/nordea-tunnusluvut-sovellus-ja-rootattu-puhelin/"
+---
+<p><strong>Käyn kirjoituksessa läpi kuinka saat käyttöönotettua Nordea <a href="https://play.google.com/store/apps/details?id=com.nordea.mobiletoken" target="_blank">tunnusluvut-sovelluksen</a> rootatulla Android puhelimella.</strong> Esittämäni tapa on vain yksi keino muiden joukossa ja sivun kommenteista löydätte paljon muita neuvoja.</p>
+<h2>Johdanto</h2>
+<p>Nordea julkaisi mennellä viikolla uuden <a href="https://play.google.com/store/apps/details?id=com.nordea.mobiletoken" target="_blank">tunnusluvut-sovelluksen</a>, joka poistaa kokonaan tarpeen käyttää vanhaa paperista tunnuslukukorttia. Isolle osalle Android-puhelimen omistajista jäi kuitenkin karvas maku suuhun, kun Nordea oli tietoturvauhkaan vedoten estänyt sovelluksen käytön rootatussa Android-puhelimessa. Väitteen tietoturvauhasta tekee hauskaksi se, että tunnetusti Android-puhelinvalmistajat eivät ole ahkerasti päivittäneet vanhoja puhelinmallejaan, vaan he keskittyvät lähinnä uusimpiin puhelinmalleihin ja niiden päivityksiin. Monet ovatkin tästä johtuen joutuneet turvautumaan kolmannen osapuolen kustomoituihin ROMeihin (ei virallinen käyttöjärjestelmä), jotka ovat tuoneet puhelimeen päivittyneemmän Android version, ja näin ollen nimenomaan parantaneet omaa tietoturvaansa. Tunnetuimpana näistä toimii CyanogenMod. <strike>Kustomoidun ROMin asennus vaatii puhelimen roottauksen, eli toisin sanoen se antaa käyttäjällensä valtuuden kirjoittaa uuden ROMin vanhan päälle</strike>. Korjattu: ROMin ei tarvitse olla rootattu, mutta kyseessä on myös periaate - eikö minulla saisi olla omistamaani puhelimeen kaikkia oikeuksia?</p>
+<p>Tunnusluvut-sovellus ilmoittaa seuraavasti rootatun puhelimen<br />
+<span style="color: #ff0000;"><em>&#8220;Laitteesi käyttöjärjestelmä näyttää olevan murrettu. Sovelluksen käyttö ei ole sallittua murretulla käyttöjärjestelmällä tietoturvasyistä.&#8221;</em></span>.</p>
+<p>Sama englanninkielisellä käyttöliittymällä:<br />
+<span style="color: #ff0000;"><em>&#8220;Your phone seems to be rooted/jailbroken. Application usage is not allowed with such a device for security reasons.&#8221;</em></span>.</p>
+<h2>Kuinka kiertää rajoitus?</h2>
+<h3>Xposed Framework</h3>
+<p>Tällä hetkellä helpoin tapa kiertää rajoitus on käyttää <a href="http://repo.xposed.info/module/de.robv.android.xposed.installer">Xposed Frameworkin</a> päälla rakennettua <a href="http://repo.xposed.info/module/fi.razerman.nordearootbypasser">Nordea RootBypasser</a> -moduulia. Ikävänä puolena on se, että Xposed Framework ei toimi uusimmissa Android versiossa, joka rajaa paljon sen käyttöä.</p>
+<h3>Patch APK</h3>
+<p>Toinen tapa on noudattaa Razerin julkaisemaa ohjetta, jossa muokataan pois tarkistus itse apk:sta. Ohjeet löydät seuraavan linkin takaa: <a href="https://github.com/Razer2015/NordeaTunnusluvut_Patched/wiki/Tunnusluvut-1.5.1-Patch-Instructions">https://github.com/Razer2015/NordeaTunnusluvut_Patched/wiki/Tunnusluvut-1.5.1-Patch-Instructions</a>.</p>
+<h2>Kuinka rajoituksen sai kierrettyä vanhoissa versioissa?</h2>
+<p><span style="color:red">Tämä kappale on vanhentunut. Suosittelen ensisijaisesti kokeilemaan edellä mainittuja tapoja.</span></p>
+<p>Android-puhelimessa ei ole mitään suoranaista tapaa tarkistaa onko puhelin rootattu tai ei, joka on hyvä meidän kannalta, jotka haluamme saada Nordean tunnusluvut-sovelluksen toimimaan rootatussa Android-puhelimessa. Alla on ohjeet, kuinka voit kiertää Nordean tunnusluvut-sovelluksen tekemän tarkistuksen rootatussa Android-puhelimesta.</p>
+<p>Nordean tunnusluvut-sovellus yrittää etsiä <strong>su</strong>-binääritiedostoa /system/bin ja /system/xbin hakemistoista, joka kertoo sen onko puhelin rootattu. Yksinkertainen ratkaisu on siis nimetä uudelleen su-tiedoston nimi toiseksi kuin sen oletus on. Ohjeissani se on nimetty <strong>subackup</strong> nimiseksi.</p>
+<p>Testattu:<br />
+&#8211; CyanogenMod 10.2.0-i9300</p>
+<h3>Pikaohjeet</h3>
+<p>Aja seuraavat komennot puhelimen Terminalissa tai adb shellissä, ja nauti Nordea tunnusluvut-sovelluksesta</p>
+
+{% highlight shell %}
+$ su
+$ mount -o remount,rw /system /system
+$ cd /system/bin
+$ mv su subackup
+$ cd /system/xbin
+$ mv su subackup
+$ mount -o remount,ro /system /system
+$ exit
+{% endhighlight %}
+
+<h3>Ohjeet vaiheittain selitettynä</h3>
+<p>Asenna <a href="https://play.google.com/store/apps/details?id=jackpal.androidterm" target="_blank">Terminal Emulator</a>.</p>
+<p>Nosta Terminal Emulatorissa käyttöoikeutesi super-käyttäjän tasolle</p>
+
+{% highlight shell %}
+$ su
+{% endhighlight %}
+
+<p>Meidän pitää uudelleen nimetä /system-hakemiston alla olevaa tiedostoa. Oletuksena /system on mountattu vain lukuoikeuksilla, joten ensimmäiseksi meidän on lisättävä siihen mukaan myös kirjoitusoikeudet.</p>
+
+{% highlight shell %}
+$ mount -o remount,rw /system /system
+{% endhighlight %}
+
+<p>Siirrytään /system/bin-hakemistoon ja muutetaan <strong>su</strong> tiedoston nimeksi <strong>subackup</strong>. Sama tehdään myös /system/xbin-hakemiston alle.</p>
+
+{% highlight shell %}
+$ cd /system/bin
+$ mv su subackup
+$ cd /system/xbin
+$ mv su subackup
+{% endhighlight %}
+
+<p>Muutetaan /system-hakemistoon takaisin vain lukuoikeudet ja poistutaan hallitusti super-käyttäjän oikeuksista</p>
+
+{% highlight shell %}
+$ mount -o remount,ro /system /system
+$ exit
+{% endhighlight %}
+
+<p>Tämän jälkeen Nordean tunnusluvut-sovellus ei enää herjaa rootatusta puhelimesta.</p>
+<p>Päivitetty: 02.07.2017</p>

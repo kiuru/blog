@@ -1,0 +1,159 @@
+---
+layout: post
+author: Niko Kiuru
+title: Scan of the Month 15
+date: 2013-09-19 19:37:56.000000000 +03:00
+categories:
+- Linux palvelimena - ICT4TN003
+tags:
+- honeynet
+- linux
+- sleuthkit
+permalink: "/2013/09/scan-of-the-month-15/"
+---
+<p>Sain Tero Karvisen järjestämän kurssin <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linux-palvelimena-ict4tn003-9-ja-10-syksylla-2013" target="_blank">Linux palvelimena</a> viikon tehtäväksi ratkaista honeynet projektin <a href="http://old.honeynet.org/scans/scan15/" target="_blank">Scan of the Month 15</a> tehtävän. Osa komentovinkeistä on kopioitu Tero Karvisen artikkelista: <a title="Forensic File Recovery with Linux – Undelete" href="http://terokarvinen.com/2013/forensic-file-recovery-with-linux" target="_blank">http://terokarvinen.com/2013/forensic-file-recovery-with-linux</a>.</p>
+<p>Aloitin tehtävän lataamalla tehtävänannossa olleen imagen, purkamalla sen, ja mountaamalla sen kansioon hda8:</p>
+{% highlight shell %}
+
+$ wget http://old.honeynet.org/scans/scan15/honeynet.tar.gz
+$ tar -xf honeynet.tar.gz
+$ cd honeynet
+$ mount -o "loop,noexec,nodev,ro"
+
+{% endhighlight %}
+<p>Seuraavaksi aloin pläräämään levykuvan tiedostoja, saadakseni jonkinnäköisen kokonaiskuvan siitä. Siistin tulosteen tiedostoista saa aikaan Teron laatimalla komennolla:</p>
+{% highlight shell %}
+$ sudo find -printf '%T+ M %p\n%A+ A %p\n%C+ C %p\n'|sort|less
+{% endhighlight %}
+<p>Pläräämisen jälkeen halusin nähdä, mitä kaikkea levykuvalta oli äskettäin poistunut. Tiedostojen palauttaminen ilman asianmukaisia työkaluja on hyvinkin tuskaista, ja vaatii jopa satoja eri komentoja. Onneksi tähän on paketoitu loistava ohjelmistokirjasto, jossa nuo sadat komennot saa suoritettua yhellä komennolla. Komento on tsk_recover ja se sijaitsee sleuthkit paketissa.</p>
+<p>Eli asennetaan sleuthkit:</p>
+{% highlight shell %}
+
+$ sudo apt-get install -y sleuthkit
+
+{% endhighlight %}
+<p>Seuraavaksi sitten palautetaan allokoidut- ja poistetut tiedostot saastuneesta levykuvasta.</p>
+{% highlight shell %}
+
+$ mkdir files
+$ mkdir files/allocated files/deleted
+$ tsk_recover -a honeypot.hda8.dd files/allocated/
+$ tsk_recover honeypot.hda8.dd files/deleted/
+
+{% endhighlight %}
+<p>Seuraavaksi pääsimme selaamaan palautettuja tiedostoja aikaisemmin käytetyllä komennolla:</p>
+{% highlight shell %}
+$ sudo find -printf '%T+ M %p\n%A+ A %p\n%C+ C %p\n'|sort|less
+{% endhighlight %}
+<p>Ei tarvinnut mennä kuin muutaman rivin alaspäin, niin sattumalta osui silmään muutama epäilyttävä tiedosto:<br />
+2013-09-19+19:59:56.2092938220 M ./allocated/dev/ida/.drag-on/linsniffer<br />
+2013-09-19+19:59:56.2092938220 M ./allocated/dev/ida/.drag-on/logclear</p>
+<p>Sniffer ja logcleaner, taidettiin päästä hieman rootkitin jäljille. Katsotaas mitä tämä logcleaner oikein on syönyt:</p>
+{% highlight shell %}
+$ less allocated/dev/ida/.drag-on/logclear
+{% endhighlight %}
+<p>Tuloste (logcleaner):<br />
+killall -9 linsniffer<br />
+rm -rf tcp.log<br />
+touch tcp.log<br />
+./linsniffer >tcp.log &</p>
+<p>linsniffer prosessin lopettaminen, tcp.log tiedoston poistaminen, ja sen näpistely. Tälläistä toimintaa en tahtoisi palvelimellani tapahtuvan.</p>
+<p>Tuosta saatiin paljon lisäapua selvitystä varten. Seuraavaksi haetaan kaikki MAC (= Modify Access Create) aikalogit levykuvasta, ja avataan se siististi less:llä näytölle.</p>
+{% highlight shell %}
+$ tsk_gettimes sda1.dd >rawtimes
+$ mactime -b rawtimes|less
+{% endhighlight %}
+<p>Nyt minulla on täydellinen aikakirja palvelimella tapahtuvista muutoksista sen perustamisesta lähtien. Tehtävän annossa annettiin jo yksi tärkeä vihje, päivämäärä 2001-03-15 jolloin rootkit oli päässyt palvelimelle.</p>
+<p>Pystymme etsimään lessissä helposti päivämäärän perusteella, hyökkäämis päivän logit kirjoittamalla lessiin:<br />
+/Mar 15 2001</p>
+<p>Kun pääsin oikealle kohdalle, tein uuden haun aikaisemmin havaitullani tiedostolla logclear:lla.<br />
+/logclear</p>
+<p>Haku johdatti minut seuraavien tapahtumien luokse:</p>
+{% highlight shell %}
+
+Fri Mar 16 2001 03:36:48   520333 m... r/rrw-r--r-- 0        0        23       lk.tgz (deleted)
+Fri Mar 16 2001 03:44:50   611931 .a.. -/rrwxr-xr-x 0        0        2039     $OrphanFiles/OrphanFile-2039 (deleted)
+                                1 .a.. -/rrw-r--r-- 0        0        2040     $OrphanFiles/OrphanFile-2040 (deleted)
+                             1345 .a.. -/rrwxr-xr-x 0        0        2043     $OrphanFiles/OrphanFile-2043 (deleted)
+                              880 .a.. -/rrw-r--r-- 0        0        2048     $OrphanFiles/OrphanFile-2048 (deleted)
+                              344 .a.. -/rrw-r--r-- 0        0        2050     $OrphanFiles/OrphanFile-2050 (deleted)
+                              688 .a.. -/rrw-r--r-- 0        0        2052     $OrphanFiles/OrphanFile-2052 (deleted)
+                            33280 .a.. r/rrwxr-xr-x 0        0        2055     bin/ps
+                            35300 .a.. r/rrwxr-xr-x 0        0        2056     bin/netstat
+                           520333 .a.. r/rrw-r--r-- 0        0        23       lk.tgz (deleted)
+Fri Mar 16 2001 03:45:02    12288 m.c. d/drwxrwxr-x 0        0        20089    dev/ida
+                             4060 .a.. -/rrwxr-xr-x 0        0        2047     $OrphanFiles/OrphanFile-2047 (deleted)
+                             8268 .a.. -/rrwx------ 0        0        2053     $OrphanFiles/OrphanFile-2053 (deleted)
+                            33280 ..c. r/rrwxr-xr-x 0        0        2055     bin/ps
+                            35300 ..c. r/rrwxr-xr-x 0        0        2056     bin/netstat
+                            19840 ..c. r/rrwxr-xr-x 0        0        2057     sbin/ifconfig
+                            53588 .ac. -/rrwxr-xr-x 0        0        2058     $OrphanFiles/OrphanFile-2058 (deleted)
+                               75 .a.. -/rrwx------ 0        0        2059     $OrphanFiles/OrphanFile-2059 (deleted)
+                            34816 m.c. d/drwxr-xr-x 0        0        24097    dev
+                               71 mac. r/rrw-r--r-- 0        0        26461    dev/rpm
+                               71 mac. r/rrw-r--r-- 0        0        26461    etc/mtab~ (deleted-realloc)
+                               87 mac. r/rrw-r--r-- 0        0        26479    dev/last
+                             2048 m.c. d/drwxr-xr-x 0        0        30121    bin
+                            11952 .a.. r/rrwxr-xr-x 0        0        30130    bin/chown
+                            66736 ..c. -/rrwxr-xr-x 0        0        30188    $OrphanFiles/OrphanFile-30188 (deleted)
+                            60080 ..c. -/rr-xr-xr-x 0        0        30191    $OrphanFiles/OrphanFile-30191 (deleted)
+                             3072 m.c. d/drwxr-xr-x 0        0        48193    sbin
+                            42736 ..c. -/rrwxr-xr-x 0        0        48284    $OrphanFiles/OrphanFile-48284 (deleted)
+                             7165 m.c. r/rrwx------ 0        0        60261    dev/ida/.drag-on/linsniffer
+                               75 mac. r/rrwx------ 0        0        60262    dev/ida/.drag-on/logclear
+                             4060 mac. r/rrwxr-xr-x 0        0        60263    dev/ida/.drag-on/sense
+                             8268 mac. r/rrwx------ 0        0        60264    dev/ida/.drag-on/sl2
+                           632066 m.c. r/rrwxr-xr-x 0        0        60265    dev/ida/.drag-on/mkxfs
+                              708 m.c. r/rrw-r--r-- 0        0        60266    dev/ida/.drag-on/s
+                              540 m.c. r/rrw------- 0        0        60267    dev/ida/.drag-on/ssh_host_key
+                             7165 mac. r/rrwx------ 0        0        60269    dev/ida/.. /linsniffer
+                               75 mac. r/rrwx------ 0        0        60270    dev/ida/.. /logclear
+                             4060 mac. r/rrwxr-xr-x 0        0        60271    dev/ida/.. /sense
+                             8268 mac. r/rrwx------ 0        0        60272    dev/ida/.. /sl2
+                           632066 .a.. r/rrwxr-xr-x 0        0        60273    dev/ida/.. /mkxfs
+
+{% endhighlight %}
+<p>Aika ja päivämääriä ei tässä kohti kannata katsoa päivän tarkkuudella, koska on otettava huomioon myös eri aikavyöhykkeet, jolloin logien päivämäärä voi olla eri kuin hyökkäyspäivämäärä sinun ajassasi.<br />
+Löysin kuitenkin yhden epäilyttävän paketin heti hakemistorakenteen juuresta - lk.tgz, joka oli vielä poistettu myöhemmin. Palataan aikaisemmin palauttamiimme poistettuihin tiedostoihin, ja listataan ne:</p>
+{% highlight shell %}
+$ cd files/deleted/
+$ ls
+{% endhighlight %}
+<p>Tuloste:<br />
+etc  lk.tgz  $OrphanFiles</p>
+<p>Löysimme paketin. Puretaan tiedosto ja katsotaan mitä se pitää sisällään:</p>
+{% highlight shell %}
+$ tar -xf lk.tgz
+{% endhighlight %}
+<p>sisällä on last niminen kansio, joka pitää sisällään kasan rootkitin tiedostoja.</p>
+{% highlight shell %}
+$ ls|less
+{% endhighlight %}
+<p>Tuloste:</p>
+{% highlight shell %}
+
+cleaner
+ifconfig
+inetd.conf
+install
+last.cgi
+linsniffer
+logclear
+lsattr
+mkxfs
+netstat
+pidfile
+ps
+s
+sense
+services
+sl2
+ssh
+ssh_config
+sshd_config
+ssh_host_key
+ssh_host_key.pub
+ssh_random_seed
+top
+
+{% endhighlight %}

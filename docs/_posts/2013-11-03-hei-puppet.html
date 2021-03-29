@@ -1,0 +1,75 @@
+---
+layout: post
+author: Niko Kiuru
+title: Hei Puppet!
+date: 2013-11-03 20:09:16.000000000 +02:00
+categories:
+- Linux centralized management – ict4tn011-4
+tags:
+- linux
+- Puppet
+- Ubuntu
+permalink: "/2013/11/hei-puppet/"
+---
+<p>Kirjoitan tämän artikkelin osana Tero Karvisen vetämää <a href="http://terokarvinen.com/2013/aikataulu-%E2%80%93-linuxin-keskitetty-hallinta-%E2%80%93-ict4tn011-4-syksylla-2013" target="_blank">Linuxin keskitetty hallinta</a> -kurssia. Tehtäväksi saimme luoda lyhyen Hei maailma! esimerkin puppetilla.</p>
+<p>Puppet on työkalu Linuxin keskitettyyn hallintaan. Puppetilla voimme luoda omia moduuleja, joille voimme koodata tiettyjä tehtäviä, ja Puppet pitää huolen siitä, että se pitää sen ja orja-tietokoneet ajantasalla. Puppet on hyvä työkalu kun hallitset useita Linux-tietokoneita, joille tarvitset samoja ominaisuuksia. Puppetin avulla et joudu jokaiselle tietokoneelle tekemään erillisiä asennuksia / konfiguraatioita, vaan pystyt hoitamaan sen keskitetysti, jolloin työtehokkuus paranee.</p>
+<p>Työvaiheet:<br />
+1. Asennetaan puppet.<br />
+2. Testataan asennus.<br />
+3. Luodaan uusi puppet moduuli.</p>
+<p>Ensimmäseksi asennetaan puppet:</p>
+{% highlight shell %}
+
+$ sudo apt-get update
+$ sudo apt-get install puppet
+
+{% endhighlight %}
+<h2>Yhdenrivin Puppet testi</h2>
+<p>Puppetin toiminnan voimme testaa Tero Karvisen artikkelissa <a href="http://terokarvinen.com/2013/hello-puppet-revisited-%E2%80%93-on-ubuntu-12-04-lts" target="_blank">Hello Puppet revisited – on Ubuntu 12.04 LTS</a> mainitsemalla yhden rivin testillä:</p>
+{% highlight shell %}
+
+$ puppet apply -e 'file { "/tmp/heiPuppet": content => "Hei Puppet!" }'
+
+{% endhighlight %}
+<p>Puppet vastaa:</p>
+{% highlight shell %}
+
+notice: /Stage[main]//File[/tmp/heiPuppet]/ensure: defined content as '{md5}306f13b60c36a7fbd6fee421fec478f6'
+notice: Finished catalog run in 0.01 seconds
+
+{% endhighlight %}
+<p>Kun ajamme komennon uudestaan saamme tulokseksi:</p>
+{% highlight shell %}
+
+notice: Finished catalog run in 0.01 seconds
+
+{% endhighlight %}
+<p>Ajettuamme komento uudestaan, puppet ei sano tehneensä mitään. Tämä johtuu siitä, että kaikki oli ajantasallaan, eli tiedosto /tmp/heiPuppet oli olemassa, ja siellä lukee "Hei Puppet!".</p>
+<h2>Luo uusi Puppet moduuli</h2>
+<p>Seuraavaksi teemme yksinkertaisen puppet moduulin, joka hoitaa tämän saman operaation. Puppet moduulit ovat siis ohjelmia, joiden avulla puppettia hallinnoidaan.</p>
+<p>Tehdään uusi heipuppet moduuli (HUOM! Moduulin nimi tulee kirjoittaa pienellä!). Ensimmäiseksi tehdään seuraava kansiorakenne puppet moduulia varten, ja tehdään manifestsin alle init.pp -tiedosto, jonne puppetin ohjelmointi suoritetaan:</p>
+{% highlight shell %}
+
+$ mkdir -p modules/heipuppet/manifests/
+$ nano modules/heipuppet/manifests/init.pp
+
+{% endhighlight %}
+<p>Kirjoitetaan seuraava koodinpätkä init.pp -tiedostoon:</p>
+{% highlight shell %}
+
+class heipuppet {
+  file { '/tmp/heiPuppet':
+    content => "Hei Puppet!\nTämä tiedoston teki meidän Puppet moduuli!"
+  }
+}
+
+{% endhighlight %}
+<p>Moduulin voit ajaa seuraavalla komennolla:</p>
+{% highlight shell %}
+
+$ puppet apply --modulepath modules/ -e 'class {"heipuppet":}'
+
+{% endhighlight %}
+<p>Ja näin meidän /tmp kansioon on onnistuneesti syntynyt heiPuppet tiedosto.</p>
+<h2>Lähde</h2>
+<p><a href="http://terokarvinen.com/2013/hello-puppet-revisited-%E2%80%93-on-ubuntu-12-04-lts" target="_blank">http://terokarvinen.com/2013/hello-puppet-revisited-%E2%80%93-on-ubuntu-12-04-lts</a></p>

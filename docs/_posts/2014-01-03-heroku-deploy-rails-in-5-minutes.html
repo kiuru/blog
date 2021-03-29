@@ -1,0 +1,121 @@
+---
+layout: post
+author: Niko Kiuru
+title: Heroku deploy Rails in 5 minutes
+date: 2014-01-03 21:11:37.000000000 +02:00
+categories: []
+tags:
+- deploy
+- Heroku
+- Ruby on Rails
+permalink: "/2014/01/heroku-deploy-rails-in-5-minutes/"
+---
+<p>In this post I will show, how you can easily getting started to deploy your Ruby on Rails project in Heroku. Heroku is free cloud platform as service (PaaS), and they bet to easily project deployment service.</p>
+<p>This guide is helpful only for those who are trying Heroku at first time! We will skip Active Record begin on this project, when we could better only test Heroku for Rails.</p>
+<p>If you are not yet registered to Heroku, do it now:<br />
+<a title="Heroku signup" href="https://id.heroku.com/signup">https://id.heroku.com/signup</a>.</p>
+<p>I was using Ruby 1.9.3p484 and Rails 4.0.0 on Ubuntu 13.10 64-bit.</p>
+<h2>1. Create new Rails project</h2>
+<p>And generate welcome controller with index action:</p>
+{% highlight shell %}
+
+$ rails new hello-heroku --skip-active-record
+$ cd hello-heroku
+$ rails g controller welcome index
+
+{% endhighlight %}
+<p>Add to root routing from <strong>config/routes.rb</strong>:</p>
+{% highlight shell %}
+
+$ nano config/routes.rb
+
+{% endhighlight %}
+<p>Uncomment next line:</p>
+{% highlight shell %}
+
+root 'welcome#index'
+
+{% endhighlight %}
+<p>Heroku require that you modify little bit your project <strong>/bin</strong> files (bundle, rails, rake) shebang.<br />
+Change:</p>
+{% highlight shell %}
+
+#!/usr/bin/env ruby1.9.1
+
+{% endhighlight %}
+<p>to</p>
+{% highlight shell %}
+
+#!/usr/bin/env ruby
+
+{% endhighlight %}
+<h3>1.1. Heroku Procfile</h3>
+<p>Create new Procfile on project root for Heroku:</p>
+{% highlight shell %}
+
+$ nano Procfile
+
+{% endhighlight %}
+<p>And write next code in file Procfile:</p>
+{% highlight shell %}
+
+web: bundle exec rails server -p $PORT
+
+{% endhighlight %}
+<h3>1.2. Initialize Git</h3>
+{% highlight shell %}
+
+$ git init
+
+{% endhighlight %}
+<p>Do first commit:</p>
+{% highlight shell %}
+
+$ git add .
+$ git commit -m "first commit"
+
+{% endhighlight %}
+<h2>2. Heroku</h2>
+<p>Is time to install heroku toolbelt:</p>
+{% highlight shell %}
+
+$ wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+
+{% endhighlight %}
+<p>Login to Heroku:</p>
+{% highlight shell %}
+
+$ heroku login
+
+{% endhighlight %}
+<h3>2.1. Create new Heroku app</h3>
+{% highlight shell %}
+
+$ heroku create
+
+{% endhighlight %}
+<p>Push your project to Heroku:</p>
+{% highlight shell %}
+
+$ git push heroku master
+
+{% endhighlight %}
+<h2>3. Test</h2>
+<p>Open your Heroku App to browser:</p>
+{% highlight shell %}
+
+$ heroku open
+
+{% endhighlight %}
+<p>If your browser opened page looks like next:</p>
+{% highlight shell %}
+
+Welcome#index
+
+Find me in app/views/welcome/index.html.erb
+
+{% endhighlight %}
+<p>You are successfully deploy your Rails app in Heroku!</p>
+<h2>Source</h2>
+<p><a href="https://toolbelt.heroku.com/">https://toolbelt.heroku.com/</a><br />
+<a href="https://devcenter.heroku.com/articles/getting-started-with-rails4">https://devcenter.heroku.com/articles/getting-started-with-rails4</a></p>

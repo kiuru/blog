@@ -1,0 +1,109 @@
+---
+layout: post
+author: Niko Kiuru
+title: How to draw lines with OpenLayers
+keywords: OpenLayers, draw, line, vector
+date: 2012-12-04 23:05:30.000000000 +02:00
+categories: []
+tags:
+- OpenLayers
+permalink: "/2012/12/how-to-draw-lines-with-openlayers/"
+---
+There is example source code, how you can draw lines with OpenLayers.
+Draw one line:
+
+{% highlight html %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DrawLine</title>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div id="map" style="top: 0; left: 0; bottom: 0; right: 0; position: fixed;"></div>
+		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+		<script type="text/javascript">
+			// Initialize
+			var mapnik         = new OpenLayers.Layer.OSM(); // OpenStreetMap
+			var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+			var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+			var lon			   = 24.9342;
+			var lat			   = 60.2017;
+			var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+			var positiontwo    = new OpenLayers.LonLat(30.9342, 62.2017).transform( fromProjection, toProjection);
+			var zoom           = 5; 
+			var map = new OpenLayers.Map("map");
+			map.addLayer(mapnik);
+			// Add marker
+			var markers = new OpenLayers.Layer.Markers( "Markers" );
+			map.addLayer(markers);
+			markers.addMarker(new OpenLayers.Marker(position));
+			// Start and end point
+			var start_point = new OpenLayers.Geometry.Point(lon, lat).transform( fromProjection, toProjection);
+			var end_point = new OpenLayers.Geometry.Point(30.9342, 62.2017).transform( fromProjection, toProjection);
+			// new vector graphic layer
+			var vector = new OpenLayers.Layer.Vector();
+			// Make line
+			var line = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString([start_point, end_point]));
+			// Add new feature to layer named by vector
+			vector.addFeatures([line]);
+			// Add vector layer to map
+			map.addLayers([vector]);
+			map.setCenter(position, zoom );
+		</script>
+	</body>
+</html>
+{% endhighlight %}
+
+Draw multiple lines:
+
+{% highlight html %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Draw MultiLines</title>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div id="map" style="top: 0; left: 0; bottom: 0; right: 0; position: fixed;"></div>
+		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+		<script type="text/javascript">
+			// Initialize
+			var mapnik         = new OpenLayers.Layer.OSM(); // OpenStreetMap
+			var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+			var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+			var lon			   = 24.9342;
+			var lat			   = 60.2017;
+			var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+			var zoom           = 5; 
+			var map = new OpenLayers.Map("map");
+			map.addLayer(mapnik);
+			// Add marker
+			var markers = new OpenLayers.Layer.Markers( "Markers" );
+			map.addLayer(markers);
+			markers.addMarker(new OpenLayers.Marker(position));
+			// Add Vector
+			var vector = new OpenLayers.Layer.Vector();
+			map.addLayers([vector]);
+			// Start and end point
+			var start_point = new OpenLayers.Geometry.Point(lon, lat).transform( fromProjection, toProjection);
+			var end_point = new OpenLayers.Geometry.Point(30.9342, 62.2017).transform( fromProjection, toProjection);
+			var line = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString([start_point, end_point]));
+			vector.addFeatures([line]);
+			// Line styles
+			var style = {
+				strokeColor: "#00FF00",
+				strokeWidth: 5,
+				strokeDashstyle: "dashdot",
+			};
+			// Add second end point
+			var other_end_point = new OpenLayers.Geometry.Point(10.9342, 30.2017).transform( fromProjection, toProjection);
+			// Add second line
+			var geo = new OpenLayers.Geometry.LineString([start_point, other_end_point]);
+			var secondLine = new OpenLayers.Feature.Vector(geo, null, style); // Add styles what we made earlie to Vector construct
+			vector.addFeatures([secondLine]);
+			map.setCenter(position, zoom );
+		</script>
+	</body>
+</html>
+{% endhighlight %}
